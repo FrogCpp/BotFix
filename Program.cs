@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Reflection;
 using static BotFix.MainProgram;
 using static BotFix.SplitDemo;
 
@@ -9,9 +9,9 @@ namespace BotFix
     {
         static void Main()
         {
-            //SplitDemo.Run();
+            SplitDemo.Run();
 
-            MainProgram.Run();
+            //MainProgram.Run();
         }
     }
 }
