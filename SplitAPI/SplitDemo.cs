@@ -8,7 +8,7 @@ namespace BotFix
     {
         static public void Run()
         {
-            Title = "Split demo v1.3";
+            Title = "Split demo v1.4.2";
 
             Write("\n\t\tEnter weekday number (1-7) or 0 to exit: ");
             string weekdayInput = ReadLine() ?? "";

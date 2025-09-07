@@ -138,34 +138,25 @@ namespace BotFix
                     }
                 }
 
-                Subject buffer = currentSubjects[i];
-                currentSubjects[i] = currentSubjects[minId];
-                currentSubjects[minId] = buffer;
-
-                buffer = currentSubjects[^(i + 1)];
-                currentSubjects[^(i + 1)] = currentSubjects[maxId];
-                currentSubjects[maxId] = buffer;
+                (currentSubjects[minId], currentSubjects[i]) = (currentSubjects[i], currentSubjects[minId]);
+                (currentSubjects[maxId], currentSubjects[^(i + 1)]) = (currentSubjects[^(i + 1)], currentSubjects[maxId]);
             }
 
 
             List<Subject> sortedUniqueSubjects = currentSubjects;
 
-            for (var i = sortedUniqueSubjects.Count - 1; i > 0; i--)
+            var heaviestSortedId = sortedUniqueSubjects.Count - 1;
+            if (heaviestSortedId >= 0 && sortedUniqueSubjects[heaviestSortedId].WeightG >= perfectWeight)
             {
-                if (sortedUniqueSubjects[i].WeightG > perfectWeight)
-                {
-                    Subject heaviest = sortedUniqueSubjects[i];
-                    sortedUniqueSubjects.RemoveAt(i);
+                Subject heaviest = sortedUniqueSubjects[heaviestSortedId];
+                sortedUniqueSubjects.RemoveAt(heaviestSortedId);
 
-                    bitMaskResult = 1 << i;
-                    return 
-                    [
-                        [ heaviest ],
-                        sortedUniqueSubjects
-                    ];
-                    
-                }
-                else break;
+                bitMaskResult = 1 << heaviestSortedId;
+                return 
+                [
+                    [ heaviest ],
+                    sortedUniqueSubjects
+                ];  
             }
 
             if (throwException)  return FilteredDataSplitFor2(sortedUniqueSubjects, perfectWeight, out bitMaskResult);
