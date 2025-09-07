@@ -92,58 +92,59 @@ namespace BotFix
         public static List<List<Subject>>? NextFor2(List<Subject> currentSubjects, out Int32 bitMaskResult, bool throwException = true)
         {
             float perfectWeight = 0;
-            UInt32 min = UInt32.MaxValue, max = 0, buffer;
-            Int32 minId = 0, maxId = 0;
-
 
             for (var id1 = 0; id1 < currentSubjects.Count; id1++)
             {
                 perfectWeight += currentSubjects[id1].WeightG;
 
+                if (!currentSubjects[id1].HasTextbook)
+                {
+                    perfectWeight -= currentSubjects[id1].WeightG;
+                    currentSubjects.RemoveAt(id1);
+
+                    id1--;
+                    continue;
+                }
                 for (var id2 = id1 + 1; id2 < currentSubjects.Count; id2++)
                 {
                     if (currentSubjects[id1].Id == currentSubjects[id2].Id)
                     { 
-                        currentSubjects.RemoveAt(id1);
                         perfectWeight -= currentSubjects[id1].WeightG;
+                        currentSubjects.RemoveAt(id1);
 
-                        id2 += currentSubjects.Count;
                         id1--;
+                        id2 += currentSubjects.Count;
                     }
                 }
             }
             perfectWeight /= 2;
 
+            Int32 minId = 0, maxId = 0;
             for (var i = 0; i < currentSubjects.Count; i++)
             {
-                if (!currentSubjects[i].HasTextbook)
-                {
-                    currentSubjects.RemoveAt(i);
-                    i--;
-                    continue;
-                }
+                UInt32 min = UInt32.MaxValue, max = 0;
 
                 for (var j = i; j < currentSubjects.Count - i; j++)
                 {
                     if (currentSubjects[j].WeightG < min)
                     {
-                        min = currentSubjects[i].WeightG;
+                        min = currentSubjects[j].WeightG;
                         minId = j;
                     }
-                    else if (currentSubjects[j].WeightG > max)
+                    if (currentSubjects[j].WeightG > max)
                     {
-                        max = currentSubjects[i].WeightG;
+                        max = currentSubjects[j].WeightG;
                         maxId = j;
                     }
                 }
 
-                buffer = currentSubjects[i].WeightG;
-                currentSubjects[i].ChangeWeight(min);
-                currentSubjects[minId].ChangeWeight(buffer);
+                Subject buffer = currentSubjects[i];
+                currentSubjects[i] = currentSubjects[minId];
+                currentSubjects[minId] = buffer;
 
-                buffer = currentSubjects[^(i + 1)].WeightG;
-                currentSubjects[^(i + 1)].ChangeWeight(max);
-                currentSubjects[maxId].ChangeWeight(buffer);
+                buffer = currentSubjects[^(i + 1)];
+                currentSubjects[^(i + 1)] = currentSubjects[maxId];
+                currentSubjects[maxId] = buffer;
             }
 
 
@@ -152,7 +153,18 @@ namespace BotFix
             for (var i = sortedUniqueSubjects.Count - 1; i > 0; i--)
             {
                 if (sortedUniqueSubjects[i].WeightG > perfectWeight)
+                {
+                    Subject heaviest = sortedUniqueSubjects[i];
                     sortedUniqueSubjects.RemoveAt(i);
+
+                    bitMaskResult = 1 << i;
+                    return 
+                    [
+                        [ heaviest ],
+                        sortedUniqueSubjects
+                    ];
+                    
+                }
                 else break;
             }
 

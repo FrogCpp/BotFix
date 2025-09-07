@@ -10,10 +10,15 @@ namespace BotFix
         {
             Title = "Split demo v1.3";
 
-            Weekday weekday = Weekday.Tuesday;
-            List<List<Subject>> schedule =
-            [
+            Write("\n\t\tEnter weekday number (1-7) or 0 to exit: ");
+            string weekdayInput = ReadLine() ?? "";
+
+            while (weekdayInput != "0" && weekdayInput != "")
+            {
+                Weekday weekday = StringToWeekday(weekdayInput);
+                List<List<Subject>> schedule =
                 [
+                    [
                     new("РоВ"),
                     new("Физика", 599),
                     new("Алгебра", 567),
@@ -69,58 +74,74 @@ namespace BotFix
                     new("Общество"),
                     new("Общество")
                 ]
-            ];
-            List<List<Subject>>? splitResult = Split.NextFor2(schedule, weekday);
+                ];
+                List<List<Subject>>? splitResult = Split.NextFor2(schedule, weekday);
 
 
-            if (splitResult != null)
-            {
-                var userCountAfterSplit = splitResult.Count;
-                if (userCountAfterSplit == 2)
+                if (splitResult != null)
                 {
-                    var textbookCountAfterSplited = splitResult[0].Count + splitResult[1].Count;
-
-                    if (textbookCountAfterSplited == 5 || true)
+                    var userCountAfterSplit = splitResult.Count;
+                    if (userCountAfterSplit == 2)
                     {
-                        ForegroundColor = ConsoleColor.Green;
-                        Write("\n\t\tSuccessfull splitting!");
-                        ForegroundColor = ConsoleColor.Gray;
+                        var textbookCountAfterSplited = splitResult[0].Count + splitResult[1].Count;
 
-                        Write("\n\t\tUser 1: " + splitResult[0].Count);
-                        for (var i = 0; i < splitResult[0].Count; i++)
-                            Write("\n\t\t - " + splitResult[0][i].Title);
+                        if (textbookCountAfterSplited == 5 || true)
+                        {
+                            ForegroundColor = ConsoleColor.Green;
+                            Write("\n\t\tSuccessfull splitting!");
+                            ForegroundColor = ConsoleColor.Gray;
 
-                        Write("\n\n\t\tUser 2: " + splitResult[1].Count);
-                        for (var i = 0; i < splitResult[1].Count; i++)
-                            Write("\n\t\t - " + splitResult[1][i].Title);
+                            Write("\n\t\tUser 1: " + splitResult[0].Count);
+                            for (var i = 0; i < splitResult[0].Count; i++)
+                                Write("\n\t\t - " + splitResult[0][i].Title);
+
+                            Write("\n\n\t\tUser 2: " + splitResult[1].Count);
+                            for (var i = 0; i < splitResult[1].Count; i++)
+                                Write("\n\t\t - " + splitResult[1][i].Title);
+                        }
+                        else
+                        {
+                            ForegroundColor = ConsoleColor.Red;
+                            Write("\n\t\tSplit error! ");
+                            ForegroundColor = ConsoleColor.Gray;
+                            Write("\n\t\tOriginal textbook amount does not match the result sum");
+                            Write("\n\t\tOriginal count: " + 5 + ", count after split: " + textbookCountAfterSplited);
+                        }
                     }
                     else
                     {
                         ForegroundColor = ConsoleColor.Red;
                         Write("\n\t\tSplit error! ");
                         ForegroundColor = ConsoleColor.Gray;
-                        Write("\n\t\tOriginal textbook amount does not match the result sum");
-                        Write("\n\t\tOriginal count: " + 5 + ", count after split: " + textbookCountAfterSplited);
+                        Write("\n\t\tUnexpected amount of users: " + userCountAfterSplit);
                     }
                 }
                 else
                 {
                     ForegroundColor = ConsoleColor.Red;
-                    Write("\n\t\tSplit error! ");
+                    Write("\n\t\tFatal error! ");
                     ForegroundColor = ConsoleColor.Gray;
-                    Write("\n\t\tUnexpected amount of users: " + userCountAfterSplit);
+                    Write("\n\t\tSplit result is null");
                 }
-            }
-            else
-            {
-                ForegroundColor = ConsoleColor.Red;
-                Write("\n\t\tFatal error! ");
-                ForegroundColor = ConsoleColor.Gray;
-                Write("\n\t\tSplit result is null");
-            }
 
-            ReadKey();
+                Write("\n\n\t\tEnter weekday number (1-7) or 0 to exit: ");
+                weekdayInput = ReadLine();
+            }
         }
 
+        static private Weekday StringToWeekday(string input)
+        {
+            return input.ToLower() switch
+            {
+                "1" or "mon" or "monday"    => Weekday.Monday,
+                "2" or "tue" or "tuesday"   => Weekday.Tuesday,
+                "3" or "wed" or "wednesday" => Weekday.Wednesday,
+                "4" or "thu" or "thursday"  => Weekday.Thursday,
+                "5" or "fri" or "friday"    => Weekday.Friday,
+                "6" or "sat" or "saturday"  => Weekday.Saturday,
+                "7" or "sun" or "sunday"    => Weekday.Sunday,
+                _                           => Weekday.Undefined
+            };
+        }
     }
 }
