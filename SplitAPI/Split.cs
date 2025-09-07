@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 
+
 namespace TextbookSplitterAPI
 {
     public class Split
@@ -31,7 +32,7 @@ namespace TextbookSplitterAPI
             foreach (var subject in currentSubjects)
                 perfectWeight += subject.WeightG;
             perfectWeight /= 2;
-            
+
             for (var i = 0; i < currentSubjects.Count; i++)
             {
                 if (!currentSubjects[i].HasTextbook)
@@ -77,15 +78,16 @@ namespace TextbookSplitterAPI
             return FilteredDataSplitFor2(sortedUniqueSubjects, perfectWeight, out bitMaskResult);
         }
         public static List<List<Subject>> NextFor2(List<Subject> currentSubjects) => NextFor2(currentSubjects, out _);
-        
+
 
 
         private static List<List<Subject>> FilteredDataSplitFor2(List<Subject> allUnique, float perfectWeight, out Int32 bitMaskOfBestIteration)
         {
             float minDiff = float.MaxValue, curCalcSum;
-            var totalIterations = Math.Pow(2, allUnique.Count);
-            Int32 curIterationBitMask;
-            bitMaskOfBestIteration = 0;
+            Int32 curIterationBitMask, subjectCount = allUnique.Count;
+            var totalIterations = Math.Pow(2, subjectCount);
+
+            bitMaskOfBestIteration = 0;  //  End result as a 32 bit mask
 
             for (var curIteration = 0; curIteration < totalIterations; curIteration++)
             {
@@ -93,7 +95,7 @@ namespace TextbookSplitterAPI
                 curIterationBitMask = 0;
                 curCalcSum = 0;
 
-                for (Int32 j = 0; j < allUnique.Count; j++)
+                for (Int32 j = 0; j < subjectCount; j++)
                 {
                     if ((curCombo & 1) == 1)
                     {
@@ -109,11 +111,13 @@ namespace TextbookSplitterAPI
                             minDiff = curCalcSum - perfectWeight;
                             bitMaskOfBestIteration = curIterationBitMask;
                         }
-                        else if (Math.Abs(perfectWeight - curCalcSum + allUnique[j].WeightG) < minDiff)
+                        if (Math.Abs(perfectWeight - curCalcSum + allUnique[j].WeightG) < minDiff)
                         {
                             minDiff = curCalcSum - allUnique[j].WeightG;
                             bitMaskOfBestIteration = curIterationBitMask & ~(1 << j);
                         }
+
+                        j += subjectCount; // break loop after exceeding half weight point
                     }
                 }
             }
