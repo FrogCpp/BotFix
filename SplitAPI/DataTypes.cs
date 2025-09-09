@@ -22,6 +22,7 @@ namespace BotFix
         private UInt32 _weightG;
         private readonly bool _hasTextbook;
 
+        public Subject() { }// костыль для инициализации
         public Subject(string title, UInt32 weightG, bool hasTextBook = true)
         {
             _title = title;

@@ -19,7 +19,7 @@ namespace BotFix
         public string FriendKey;
         public string usrName;
         public bool guest;
-        public List<List<Subject>> MyLessonsList;
+        public List<List<Subject>> MyLessonsList = new List<List<Subject>>(0);
 
         private static string GenerateRandomString()
         {
