@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ namespace BotFix
         public string FriendKey;
         public string usrName;
         public bool guest;
+        public List<List<Subject>> MyLessonsList;
 
         private static string GenerateRandomString()
         {
@@ -99,8 +101,48 @@ namespace BotFix
                         else
                         {
                             _tgMethods.SendMessage($"Молодец, теперь твоя задача заполнить полностью расписание\nа после еще и время отправки для себя настроить", uID);
+                            _tgMethods.SendMessage($"Расписание важно указать точно по шаблону:\nпредмет1 340\nпредмет2 512\n. . .\n* (* - разделитель между днями недели)\nпредмет1 1024\nпредмет2 112\n. . .\n* (и так далее)\nцифра, через пробел после предмета, это вес учебника. его нужно указать в граммах. Для учебников вес необходимо указать. Есле предмет не имеет учебника, то стоит указать не \"0\", а просто не указывать ничего.", uID);
+                            _tgMethods.SendMessage($"Важно!\nни в начале ни в конце не должно быть ничего: сразу расписание без другого текста. После звездочек-разделителей пробелов нет. Выполняй все точно по шаблону.", uID);
                             us.registrSteps = 3;
                         }
+                    }
+                }
+            }
+        }
+
+        public void GetLessonsList(string text, long uID)
+        {
+            if (text[0] == '/')
+                return;
+
+            using (var f = new FileManager("/Users.json"))
+            {
+                UserSettings us;
+                if (f.TryGetUser(uID, out us))
+                {
+                    if (us.registrSteps == 3)
+                    {
+                        int day = 0;
+                        List<List<Subject>> LessonsLst = new List<List<Subject>>(0);
+                        List<string> a = text.Split("*\n").ToList<string>();
+                        for (int i = 0; i < a.Count; i++)
+                        {
+                            List<Subject> c = new List<Subject>();
+                            foreach (string lesson in a[i].Split('\n'))
+                            {
+                                if (lesson.Contains(' '))
+                                {
+                                    var b = lesson.Split(' ');
+                                    c.Add(new Subject(b[0], uint.Parse(b[1])));
+                                }
+                                else
+                                {
+                                    c.Add(new Subject(lesson));
+                                }
+                            }
+                            LessonsLst.Add(c);
+                        }
+                        us.MyLessonsList = LessonsLst;
                     }
                 }
             }

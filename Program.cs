@@ -9,9 +9,11 @@ namespace BotFix
     {
         static void Main()
         {
-            SplitDemo.Run();
+            //SplitDemo.Run();
 
-            //MainProgram.Run();
+            MainProgram.Run();
+
+            Console.ReadLine();
         }
     }
 }
