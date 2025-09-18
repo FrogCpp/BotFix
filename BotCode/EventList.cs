@@ -99,17 +99,29 @@ namespace BotFix
                         {
                             _tgMethods.SendMessage($"Молодец, сиди отдыхай.\nВремя отправки еще настрой, и отдыхай\nесли просчитался с ключем, ничего страшного, пропиши команду /setFriendKey и замени себе ключь. (в отличии от остальных комманд, здесь нужно указать аргумент (сам ключь) через пробел после самой комманды (примерно так /setFriendKey Кл:Ю:Чь))", uID);
                             us.registrSteps = 4; // пропустим пункт с настройкой расписания
-                            if (f.TryGetUser(us.FriendKey, out var usrs))
+                            _tgMethods.SendMessage($"так же, если ты правильно указал ключь друга, то и твоему другу мы тоже сообщим, что ты к нему подключен :)", uID);
+
+                            if (f.TryGetUser(us.FriendKey, out var friend))
                             {
-                                foreach (var boba in usrs)
+                                if (friend.Length == 1)
                                 {
-                                    if (!boba.guest)
+                                    _tgMethods.SendMessage("Друзей у тебя, похоже, нет. Либо ты ошибся с ключем. . . проверь хорошенько. (мы попытались найти человека с таким ключем, но никого нет. . .)", uID);
+                                }
+                                else
+                                {
+                                    foreach (var e in friend)
                                     {
-                                        us.MyLessonsList = boba.MyLessonsList;
+                                        if (e.userID != us.userID)
+                                        {
+                                            _tgMethods.SendMessage($"к тебе добавился твой друг {us.usrName}", e.userID);
+                                        }
                                     }
                                 }
                             }
-
+                            else
+                            {
+                                _tgMethods.SendMessage("Друзей у тебя, похоже, нет. Либо ты ошибся с ключем. . . проверь хорошенько. (мы попытались найти человека с таким ключем, такого больше нет. . .)", uID);
+                            }
                         }
                         else
                         {
@@ -157,21 +169,29 @@ namespace BotFix
                             LessonsLst.Add(c);
                         }
                         us.MyLessonsList = LessonsLst;
-                        if (f.TryGetUser(us.FriendKey, out var usrs))
-                        {
-                            foreach(var boba in usrs)
-                            {
-                                if (boba != us)
-                                {
-                                    boba.MyLessonsList = LessonsLst;
-                                }
-                            }
-                        }
                         _tgMethods.SendMessage($"с созданием расписания справились, молодец! но если молодец не до конца, и при вводе сделал ошибку, то пропиши /fail это сотрет твою учетку, и тебе придется заново создовать ее. Если гость уже зарегался до тебя, и успел ввести твой ключь, то пусть пропишет команду /setFriendKey и заменит себе ключь. (в отличии от остальных комманд, здесь нужно указать аргумент (сам ключь) через пробел после самой комманды (примерно так /setFriendKey Кл:Ю:Чь))\n\nтебе остается только настроить время!", uID);
                     }
                 }
             }
         }
+
+        /*
+        public void GetTime(string text, long uID)
+        {
+            using (var f = new FileManager("/Users.json"))
+            {
+                UserSettings us;
+                if (f.TryGetUser(uID, out var usv))
+                {
+                    us = usv[0];
+                    if (us.registrSteps == 4)
+                    {
+
+                    }
+                }
+            }
+        }
+        */
 
         public void Fuckup(string text, long uID)
         {
@@ -206,6 +226,30 @@ namespace BotFix
                 {
                     us = usv[0];
                     us.FriendKey = tx[1];
+                    _tgMethods.SendMessage($"твой новый ключь выглядит так: {us.FriendKey}", uID);
+                    _tgMethods.SendMessage($"так же, если ты правильно указал ключь друга, то и твоему другу мы тоже сообщим, что ты к нему подключен :)", uID);
+
+                    if (f.TryGetUser(us.FriendKey, out var friend))
+                    {
+                        if (friend.Length == 1)
+                        {
+                            _tgMethods.SendMessage("Друзей у тебя, похоже, нет. Либо ты ошибся с ключем. . . проверь хорошенько. (мы попытались найти человека с таким ключем, такого больше нет. . .)", uID);
+                        }
+                        else
+                        {
+                            foreach(var e in friend)
+                            {
+                                if (e.userID != us.userID)
+                                {
+                                    _tgMethods.SendMessage($"к тебе добавился твой друг {us.usrName}", e.userID);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        _tgMethods.SendMessage("Друзей у тебя, похоже, нет. Либо ты ошибся с ключем. . . проверь хорошенько. (мы попытались найти человека с таким ключем, такого больше нет. . .)", uID);
+                    }
                 }
             }
         }
