@@ -1,5 +1,7 @@
 ﻿using System;
 
+
+
 namespace BotFix
 {
     public enum Weekday
@@ -16,17 +18,19 @@ namespace BotFix
 
     public class Subject
     {
-
         private Int32  _id;
         private string _title;
         private UInt32 _weightG;
-        private readonly bool _hasTextbook;
+        private bool   _hasTextbook, _canBeSplit;
 
-        public Subject(string title, UInt32 weightG, bool hasTextBook = true)
+
+
+        public Subject(string title, UInt32 weightG, bool hasTextBook = true, bool canBeSplit = true)
         {
             _title = title;
             _weightG = weightG;
             _hasTextbook = hasTextBook;
+            _canBeSplit = canBeSplit;
 
             AssignSubjectId();
         }
@@ -35,20 +39,28 @@ namespace BotFix
             _title = title;
             _weightG = 0;
             _hasTextbook = false;
+            _canBeSplit = false;
 
             AssignSubjectId();
         }
 
 
+
         public void HardChangeTitle(string newTitle) => _title = newTitle;
-        public void ChangeTitle (string newTitle)
+        public void ChangeTitle(string newTitle)
         {
             _title = newTitle;
             AssignSubjectId();
         }
         public void ChangeWeight(UInt32 newWeightG) => _weightG = newWeightG;
+        public void ChangeFlags(bool hasTextbook, bool canBeSplit)
+        {
+            _hasTextbook = hasTextbook;
+            _canBeSplit = canBeSplit;
+        }
 
-        
+
+
         private void AssignSubjectId() => AssignSubjectId(_title);
         private void AssignSubjectId(string subjectTitle)
         {
@@ -73,9 +85,14 @@ namespace BotFix
 
 
 
-        public Int32  Id        => _id;
-        public string Title     => _title;
-        public UInt32 WeightG   => _weightG;
+        public Int32 Id => _id;
+        public string Title => _title;
+        public UInt32 WeightG => _weightG;
         public bool HasTextbook => _hasTextbook;
+        public bool CanBeSplit => _canBeSplit;
     }
+
+
+
+    
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 
 
+
 namespace BotFix
 {
     public class Split
@@ -92,6 +93,7 @@ namespace BotFix
         public static List<List<Subject>>? NextFor2(List<Subject> currentSubjects, out Int32 bitMaskResult, bool throwException = true)
         {
             float perfectWeight = 0;
+            List<Subject> unsplittableTextbooks = [];
 
             for (var id1 = 0; id1 < currentSubjects.Count; id1++)
             {
@@ -99,6 +101,16 @@ namespace BotFix
 
                 if (!currentSubjects[id1].HasTextbook)
                 {
+                    perfectWeight -= currentSubjects[id1].WeightG;
+                    currentSubjects.RemoveAt(id1);
+
+                    id1--;
+                    continue;
+                }
+                if (!currentSubjects[id1].CanBeSplit)
+                {
+                    unsplittableTextbooks.Add(currentSubjects[id1]);
+
                     perfectWeight -= currentSubjects[id1].WeightG;
                     currentSubjects.RemoveAt(id1);
 
@@ -159,12 +171,12 @@ namespace BotFix
                 ];  
             }
 
-            if (throwException)  return FilteredDataSplitFor2(sortedUniqueSubjects, perfectWeight, out bitMaskResult);
+            if (throwException) return SplitCombineLogic(sortedUniqueSubjects, perfectWeight, out bitMaskResult, unsplittableTextbooks);
             else
             {
                 try
                 {
-                    return FilteredDataSplitFor2(sortedUniqueSubjects, perfectWeight, out bitMaskResult);
+                    return SplitCombineLogic(sortedUniqueSubjects, perfectWeight, out bitMaskResult, unsplittableTextbooks);
                 }
                 catch
                 {
@@ -178,6 +190,15 @@ namespace BotFix
 
 
 
+        private static List<List<Subject>> SplitCombineLogic(List<Subject> allUnique, float perfectWeight, out Int32 bitMaskOfBestIteration, List<Subject> unsplittableTextbooks)
+        {
+            List<List<Subject>> split = FilteredDataSplitFor2(allUnique, perfectWeight, out bitMaskOfBestIteration);
+
+            split[0].AddRange(unsplittableTextbooks);
+            split[1].AddRange(unsplittableTextbooks);
+
+            return split;
+        }
         private static List<List<Subject>> FilteredDataSplitFor2(List<Subject> allUnique, float perfectWeight, out Int32 bitMaskOfBestIteration)
         {
             float minDiff = float.MaxValue, curCalcSum;
