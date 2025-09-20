@@ -8,7 +8,7 @@ namespace BotFix
 {
     public class Split
     {
-        static public List<List<Subject>>? NextFor2(List<List<Subject>> fullSchedule, Weekday weekday, out Int32 bitMaskResult, bool throwException = true)
+        static public List<List<Subject>> NextFor2(List<List<Subject>> fullSchedule, Weekday weekday, out Int32 bitMaskResult, bool throwException = true)
         {
             WeekdayOverloadValidate(fullSchedule, weekday, throwException);
 
@@ -22,11 +22,11 @@ namespace BotFix
                 catch 
                 { 
                     bitMaskResult = 0;
-                    return null; 
+                    return [ [] ]; 
                 }
             }
         }
-        static public List<List<Subject>>? NextFor2(List<List<Subject>> fullSchedule, Weekday weekday, bool throwException = true)
+        static public List<List<Subject>> NextFor2(List<List<Subject>> fullSchedule, Weekday weekday, bool throwException = true)
         {
             WeekdayOverloadValidate(fullSchedule, weekday, throwException);
 
@@ -39,7 +39,7 @@ namespace BotFix
                 }
                 catch 
                 { 
-                    return null; 
+                    return [ [] ]; 
                 }
             }
         }
@@ -90,7 +90,7 @@ namespace BotFix
 
 
 
-        static public List<List<Subject>>? NextFor2(List<Subject> currentSubjects, out Int32 bitMaskResult, bool throwException = true)
+        static public List<List<Subject>> NextFor2(List<Subject> currentSubjects, out Int32 bitMaskResult, bool throwException = true)
         {
             float perfectWeight = 0;
             List<Subject> unsplittableTextbooks = [];
@@ -131,31 +131,8 @@ namespace BotFix
             }
             perfectWeight /= 2;
 
-            Int32 minId = 0, maxId = 0;
-            for (var i = 0; i < currentSubjects.Count; i++)
-            {
-                UInt32 min = UInt32.MaxValue, max = 0;
-
-                for (var j = i; j < currentSubjects.Count - i; j++)
-                {
-                    if (currentSubjects[j].WeightG < min)
-                    {
-                        min = currentSubjects[j].WeightG;
-                        minId = j;
-                    }
-                    if (currentSubjects[j].WeightG > max)
-                    {
-                        max = currentSubjects[j].WeightG;
-                        maxId = j;
-                    }
-                }
-
-                (currentSubjects[minId], currentSubjects[i]) = (currentSubjects[i], currentSubjects[minId]);
-                (currentSubjects[maxId], currentSubjects[^(i + 1)]) = (currentSubjects[^(i + 1)], currentSubjects[maxId]);
-            }
-
-
-            List<Subject> sortedUniqueSubjects = currentSubjects;
+            
+            List<Subject> sortedUniqueSubjects = DaySchedule.Sorted(currentSubjects, SortType.LowerWeightFirst);
 
             var heaviestSortedId = sortedUniqueSubjects.Count - 1;
             if (heaviestSortedId >= 0 && sortedUniqueSubjects[heaviestSortedId].WeightG >= perfectWeight)
@@ -181,11 +158,11 @@ namespace BotFix
                 catch
                 {
                     bitMaskResult = 0;
-                    return null;
+                    return [ [] ];
                 }
             }
         }
-        static public List<List<Subject>>? NextFor2(List<Subject> currentSubjects, bool throwException = true) 
+        static public List<List<Subject>> NextFor2(List<Subject> currentSubjects, bool throwException = true) 
             => NextFor2(currentSubjects, out _, throwException);
 
 
