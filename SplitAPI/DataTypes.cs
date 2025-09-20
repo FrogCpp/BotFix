@@ -29,8 +29,8 @@ namespace BotFix
         private bool   _hasTextbook, _canBeSplit;
 
 
-
         public Subject(string title, UInt32 weightG, bool hasTextBook = true, bool canBeSplit = true)
+        public Subject(string title, UInt32 weightG, bool hasTextBook = true)
         {
             _title = title;
             _weightG = weightG;
@@ -48,6 +48,7 @@ namespace BotFix
 
             AssignSubjectId();
         }
+        public Subject() {}
 
 
 

@@ -22,15 +22,28 @@ namespace BotFix
             this.way = way;
         }
 
-        public bool TryGetUser(long userId, out UserSettings user)
+        public bool TryGetUser(long userId, out UserSettings[] users)
         {
             if (MyUsers == null || MyUsers.Count < 1)
             {
-                user = new UserSettings();
+                users = Array.Empty<UserSettings>();
                 return false;
             }
-            user = MyUsers.FirstOrDefault(u => u.userID == userId);
-            return user.userID != 0;
+
+            users = MyUsers.Where(u => u.userID == userId).ToArray();
+            return users.Length > 0;
+        }
+
+        public bool TryGetUser(string userId, out UserSettings[] users)
+        {
+            if (MyUsers == null || MyUsers.Count < 1)
+            {
+                users = Array.Empty<UserSettings>();
+                return false;
+            }
+
+            users = MyUsers.Where(u => u.FriendKey == userId).ToArray();
+            return users.Length > 0;
         }
         public void Dispose()
         {
