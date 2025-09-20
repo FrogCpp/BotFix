@@ -8,7 +8,7 @@ namespace BotFix
 {
     public class Split
     {
-        public static List<List<Subject>>? NextFor2(List<List<Subject>> fullSchedule, Weekday weekday, out Int32 bitMaskResult, bool throwException = true)
+        static public List<List<Subject>>? NextFor2(List<List<Subject>> fullSchedule, Weekday weekday, out Int32 bitMaskResult, bool throwException = true)
         {
             WeekdayOverloadValidate(fullSchedule, weekday, throwException);
 
@@ -26,7 +26,7 @@ namespace BotFix
                 }
             }
         }
-        public static List<List<Subject>>? NextFor2(List<List<Subject>> fullSchedule, Weekday weekday, bool throwException = true)
+        static public List<List<Subject>>? NextFor2(List<List<Subject>> fullSchedule, Weekday weekday, bool throwException = true)
         {
             WeekdayOverloadValidate(fullSchedule, weekday, throwException);
 
@@ -44,7 +44,7 @@ namespace BotFix
             }
         }
 
-        private static bool WeekdayOverloadValidate(List<List<Subject>> fullSchedule, Weekday weekday, bool throwException = true)
+        static private bool WeekdayOverloadValidate(List<List<Subject>> fullSchedule, Weekday weekday, bool throwException = true)
         {
             bool valid = false;
 
@@ -90,7 +90,7 @@ namespace BotFix
 
 
 
-        public static List<List<Subject>>? NextFor2(List<Subject> currentSubjects, out Int32 bitMaskResult, bool throwException = true)
+        static public List<List<Subject>>? NextFor2(List<Subject> currentSubjects, out Int32 bitMaskResult, bool throwException = true)
         {
             float perfectWeight = 0;
             List<Subject> unsplittableTextbooks = [];
@@ -166,8 +166,8 @@ namespace BotFix
                 bitMaskResult = 1 << heaviestSortedId;
                 return 
                 [
-                    [ heaviest ],
-                    sortedUniqueSubjects
+                    CombineLists(  unsplittableTextbooks, [ heaviest ]  ),
+                    CombineLists(  unsplittableTextbooks, sortedUniqueSubjects  )
                 ];  
             }
 
@@ -185,12 +185,19 @@ namespace BotFix
                 }
             }
         }
-        public static List<List<Subject>>? NextFor2(List<Subject> currentSubjects, bool throwException = true) 
+        static public List<List<Subject>>? NextFor2(List<Subject> currentSubjects, bool throwException = true) 
             => NextFor2(currentSubjects, out _, throwException);
 
 
 
-        private static List<List<Subject>> SplitCombineLogic(List<Subject> allUnique, float perfectWeight, out Int32 bitMaskOfBestIteration, List<Subject> unsplittableTextbooks)
+        static private List<T> CombineLists<T>(List<T> list1, List<T> list2)
+        {
+            List<T> combined = new(list1);
+            combined.AddRange(list2);
+
+            return combined;
+        }
+        static private List<List<Subject>> SplitCombineLogic(List<Subject> allUnique, float perfectWeight, out Int32 bitMaskOfBestIteration, List<Subject> unsplittableTextbooks)
         {
             List<List<Subject>> split = FilteredDataSplitFor2(allUnique, perfectWeight, out bitMaskOfBestIteration);
 
@@ -199,7 +206,7 @@ namespace BotFix
 
             return split;
         }
-        private static List<List<Subject>> FilteredDataSplitFor2(List<Subject> allUnique, float perfectWeight, out Int32 bitMaskOfBestIteration)
+        static private List<List<Subject>> FilteredDataSplitFor2(List<Subject> allUnique, float perfectWeight, out Int32 bitMaskOfBestIteration)
         {
             float minDiff = float.MaxValue, curCalcSum;
             Int32 curIterationBitMask, subjectCount = allUnique.Count;

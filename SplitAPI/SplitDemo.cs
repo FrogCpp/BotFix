@@ -99,10 +99,11 @@ namespace BotFix
         }
 
 
-        static private List<List<Subject>> schedule =
+
+        static private readonly List<List<Subject>> schedule =
                 [
                     [
-                    new("РоВ", 1, true, false),
+                    new("РоВ"),
                     new("Физика", 599),
                     new("Алгебра", 567),
                     new("Алгебра", 567),

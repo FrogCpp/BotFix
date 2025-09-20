@@ -19,7 +19,7 @@ namespace BotFix
         public string usrName;
         public bool guest;
 
-        private static string GenerateRandomString()
+        static private string GenerateRandomString()
         {
             var random = new Random();
             return new string(Enumerable.Range(0, 10)
