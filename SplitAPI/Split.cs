@@ -3,11 +3,12 @@ using System.Linq;
 using System.Collections.Generic;
 
 
+
 namespace BotFix
 {
     public class Split
     {
-        public static List<List<Subject>>? NextFor2(List<List<Subject>> fullSchedule, Weekday weekday, out Int32 bitMaskResult, bool throwException = true)
+        static public List<List<Subject>> NextFor2(List<List<Subject>> fullSchedule, Weekday weekday, out Int32 bitMaskResult, bool throwException = true)
         {
             WeekdayOverloadValidate(fullSchedule, weekday, throwException);
 
@@ -21,11 +22,11 @@ namespace BotFix
                 catch 
                 { 
                     bitMaskResult = 0;
-                    return null; 
+                    return [ [] ]; 
                 }
             }
         }
-        public static List<List<Subject>>? NextFor2(List<List<Subject>> fullSchedule, Weekday weekday, bool throwException = true)
+        static public List<List<Subject>> NextFor2(List<List<Subject>> fullSchedule, Weekday weekday, bool throwException = true)
         {
             WeekdayOverloadValidate(fullSchedule, weekday, throwException);
 
@@ -38,12 +39,12 @@ namespace BotFix
                 }
                 catch 
                 { 
-                    return null; 
+                    return [ [] ]; 
                 }
             }
         }
 
-        private static bool WeekdayOverloadValidate(List<List<Subject>> fullSchedule, Weekday weekday, bool throwException = true)
+        static private bool WeekdayOverloadValidate(List<List<Subject>> fullSchedule, Weekday weekday, bool throwException = true)
         {
             bool valid = false;
 
@@ -89,9 +90,10 @@ namespace BotFix
 
 
 
-        public static List<List<Subject>>? NextFor2(List<Subject> currentSubjects, out Int32 bitMaskResult, bool throwException = true)
+        static public List<List<Subject>> NextFor2(List<Subject> currentSubjects, out Int32 bitMaskResult, bool throwException = true)
         {
             float perfectWeight = 0;
+            List<Subject> unsplittableTextbooks = [];
 
             for (var id1 = 0; id1 < currentSubjects.Count; id1++)
             {
@@ -99,6 +101,16 @@ namespace BotFix
 
                 if (!currentSubjects[id1].HasTextbook)
                 {
+                    perfectWeight -= currentSubjects[id1].WeightG;
+                    currentSubjects.RemoveAt(id1);
+
+                    id1--;
+                    continue;
+                }
+                if (!currentSubjects[id1].CanBeSplit)
+                {
+                    unsplittableTextbooks.Add(currentSubjects[id1]);
+
                     perfectWeight -= currentSubjects[id1].WeightG;
                     currentSubjects.RemoveAt(id1);
 
@@ -119,31 +131,8 @@ namespace BotFix
             }
             perfectWeight /= 2;
 
-            Int32 minId = 0, maxId = 0;
-            for (var i = 0; i < currentSubjects.Count; i++)
-            {
-                UInt32 min = UInt32.MaxValue, max = 0;
-
-                for (var j = i; j < currentSubjects.Count - i; j++)
-                {
-                    if (currentSubjects[j].WeightG < min)
-                    {
-                        min = currentSubjects[j].WeightG;
-                        minId = j;
-                    }
-                    if (currentSubjects[j].WeightG > max)
-                    {
-                        max = currentSubjects[j].WeightG;
-                        maxId = j;
-                    }
-                }
-
-                (currentSubjects[minId], currentSubjects[i]) = (currentSubjects[i], currentSubjects[minId]);
-                (currentSubjects[maxId], currentSubjects[^(i + 1)]) = (currentSubjects[^(i + 1)], currentSubjects[maxId]);
-            }
-
-
-            List<Subject> sortedUniqueSubjects = currentSubjects;
+            
+            List<Subject> sortedUniqueSubjects = DaySchedule.Sorted(currentSubjects, SortType.LowerWeightFirst);
 
             var heaviestSortedId = sortedUniqueSubjects.Count - 1;
             if (heaviestSortedId >= 0 && sortedUniqueSubjects[heaviestSortedId].WeightG >= perfectWeight)
@@ -154,31 +143,47 @@ namespace BotFix
                 bitMaskResult = 1 << heaviestSortedId;
                 return 
                 [
-                    [ heaviest ],
-                    sortedUniqueSubjects
+                    CombineLists(  unsplittableTextbooks, [ heaviest ]  ),
+                    CombineLists(  unsplittableTextbooks, sortedUniqueSubjects  )
                 ];  
             }
 
-            if (throwException)  return FilteredDataSplitFor2(sortedUniqueSubjects, perfectWeight, out bitMaskResult);
+            if (throwException) return SplitCombineLogic(sortedUniqueSubjects, perfectWeight, out bitMaskResult, unsplittableTextbooks);
             else
             {
                 try
                 {
-                    return FilteredDataSplitFor2(sortedUniqueSubjects, perfectWeight, out bitMaskResult);
+                    return SplitCombineLogic(sortedUniqueSubjects, perfectWeight, out bitMaskResult, unsplittableTextbooks);
                 }
                 catch
                 {
                     bitMaskResult = 0;
-                    return null;
+                    return [ [] ];
                 }
             }
         }
-        public static List<List<Subject>>? NextFor2(List<Subject> currentSubjects, bool throwException = true) 
+        static public List<List<Subject>> NextFor2(List<Subject> currentSubjects, bool throwException = true) 
             => NextFor2(currentSubjects, out _, throwException);
 
 
 
-        private static List<List<Subject>> FilteredDataSplitFor2(List<Subject> allUnique, float perfectWeight, out Int32 bitMaskOfBestIteration)
+        static private List<T> CombineLists<T>(List<T> list1, List<T> list2)
+        {
+            List<T> combined = new(list1);
+            combined.AddRange(list2);
+
+            return combined;
+        }
+        static private List<List<Subject>> SplitCombineLogic(List<Subject> allUnique, float perfectWeight, out Int32 bitMaskOfBestIteration, List<Subject> unsplittableTextbooks)
+        {
+            List<List<Subject>> split = FilteredDataSplitFor2(allUnique, perfectWeight, out bitMaskOfBestIteration);
+
+            split[0].AddRange(unsplittableTextbooks);
+            split[1].AddRange(unsplittableTextbooks);
+
+            return split;
+        }
+        static private List<List<Subject>> FilteredDataSplitFor2(List<Subject> allUnique, float perfectWeight, out Int32 bitMaskOfBestIteration)
         {
             float minDiff = float.MaxValue, curCalcSum;
             Int32 curIterationBitMask, subjectCount = allUnique.Count;

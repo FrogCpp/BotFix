@@ -21,7 +21,7 @@ namespace BotFix
         public bool guest;
         public List<List<Subject>> MyLessonsList = new List<List<Subject>>(0);
 
-        private static string GenerateRandomString()
+        static private string GenerateRandomString()
         {
             var random = new Random();
             return new string(Enumerable.Range(0, 10)
