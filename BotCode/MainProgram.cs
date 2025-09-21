@@ -15,7 +15,7 @@ namespace BotFix
             a.OnEventOccurred += ev.Fuckup;
             a.OnEventOccurred += ev.GetLessonsList;
             a.OnEventOccurred += ev.GetFriend;
-            a.OnEventOccurred += ev.GetUserName; // здесь важен порядок объявления. Мы идем с конца в начало.
+            a.OnEventOccurred += ev.GetUserName;
             a.OnEventOccurred += ev.startE;
         }
     }
