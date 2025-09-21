@@ -30,10 +30,10 @@ namespace BotFix
 
 
         public Subject(string title, UInt32 weightG, bool hasTextBook = true, bool canBeSplit = true)
-        public Subject(string title, UInt32 weightG, bool hasTextBook = true)
         {
             _title = title;
             _weightG = weightG;
+
             _hasTextbook = hasTextBook;
             _canBeSplit = canBeSplit;
 
@@ -48,7 +48,10 @@ namespace BotFix
 
             AssignSubjectId();
         }
-        public Subject() {}
+        public Subject() 
+        {
+            _title = "Undefined";
+        }
 
 
 
