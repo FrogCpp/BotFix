@@ -49,11 +49,22 @@ namespace BotFix
                 Console.WriteLine(f);
                 foreach (var i in f.MyUsers)
                 {
-                    var a = new List<List<Subject>>(i.MyLessonsList);
+                    Console.WriteLine(i.usrName);
+                    List<List<Subject>> a = [];
+                    a.AddRange(i.MyLessonsList);
                     int dayNumber = (int)DateTime.Now.DayOfWeek;
                     if (a.Count >= dayNumber)
                     {
+                        foreach (var t in i.MyLessonsList)
+                        {
+                            Console.WriteLine(t.Count);
+                        }
                         List<DaySchedule> splitResult = DaySchedule.Convert(Split.NextFor2(a, intToWeekday(dayNumber)));
+                        Console.WriteLine("========");
+                        foreach (var t in i.MyLessonsList)
+                        {
+                            Console.WriteLine(t.Count);
+                        }
                         string outp = "";
                         int userNum = (i.guest ? 0 : 1);
                         int count = 0;
