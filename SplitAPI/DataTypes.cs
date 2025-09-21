@@ -52,6 +52,16 @@ namespace BotFix
         {
             _title = "Undefined";
         }
+        public void ReInit(string title, UInt32 weightG, bool hasTextBook = true, bool canBeSplit = true)
+        {
+            _title = title;
+            _weightG = weightG;
+
+            _hasTextbook = hasTextBook;
+            _canBeSplit = canBeSplit;
+
+            AssignSubjectId();
+        }
 
 
 
