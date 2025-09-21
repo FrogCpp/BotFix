@@ -16,7 +16,7 @@ namespace BotFix
 
             //MainProgram.Run();
 
-            Console.ReadLine();
+            //Console.ReadLine();
         }
     }
 }
