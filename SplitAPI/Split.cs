@@ -8,43 +8,7 @@ namespace BotFix
 {
     public class Split
     {
-        static public List<List<Subject>> NextFor2(List<List<Subject>> fullSchedule, Weekday weekday, out Int32 bitMaskResult, bool throwException = true)
-        {
-            WeekdayOverloadValidate(fullSchedule, weekday, throwException);
-
-            if (throwException) return NextFor2(fullSchedule[(Byte)weekday - 1], out bitMaskResult);
-            else
-            {
-                try
-                {
-                    return NextFor2(fullSchedule[(Byte)weekday - 1], out bitMaskResult);
-                }
-                catch 
-                { 
-                    bitMaskResult = 0;
-                    return [ [] ]; 
-                }
-            }
-        }
-        static public List<List<Subject>> NextFor2(List<List<Subject>> fullSchedule, Weekday weekday, bool throwException = true)
-        {
-            WeekdayOverloadValidate(fullSchedule, weekday, throwException);
-
-            if (throwException) return NextFor2(fullSchedule[(Byte)weekday - 1]);
-            else
-            {
-                try
-                {
-                    return NextFor2(fullSchedule[(Byte)weekday - 1]);
-                }
-                catch 
-                { 
-                    return [ [] ]; 
-                }
-            }
-        }
-
-        static private bool WeekdayOverloadValidate(List<List<Subject>> fullSchedule, Weekday weekday, bool throwException = true)
+        static private bool ValidateWeekday(List<DaySchedule> fullSchedule, Weekday weekday, bool throwException = true)
         {
             bool valid = false;
 
@@ -90,39 +54,60 @@ namespace BotFix
 
 
 
-        static public List<List<Subject>> NextFor2(List<Subject> currentSubjects, out Int32 bitMaskResult, bool throwException = true)
+        static public List<DaySchedule> NextFor2(List<DaySchedule> fullSchedule, Weekday weekday, out Int32 bitMaskResult, bool throwException = true)
+        {
+            ValidateWeekday(fullSchedule, weekday, throwException);
+
+            if (throwException) return NextFor2(fullSchedule[(Byte)weekday - 1], out bitMaskResult);
+            else
+            {
+                try
+                {
+                    return NextFor2(fullSchedule[(Byte)weekday - 1], out bitMaskResult);
+                }
+                catch 
+                { 
+                    bitMaskResult = 0;
+                    return []; 
+                }
+            }
+        }
+        static public List<DaySchedule> NextFor2(List<DaySchedule> fullSchedule, Weekday weekday, bool throwException = true)
+            => NextFor2(fullSchedule, weekday, out _, throwException);
+
+        static public List<DaySchedule> NextFor2(DaySchedule currentSubjects, out Int32 bitMaskResult, bool throwException = true)
         {
             float perfectWeight = 0;
             List<Subject> unsplittableTextbooks = [];
 
             for (var id1 = 0; id1 < currentSubjects.Count; id1++)
             {
-                perfectWeight += currentSubjects[id1].WeightG;
+                perfectWeight += currentSubjects.S[id1].WeightG;
 
-                if (!currentSubjects[id1].HasTextbook)
+                if (!currentSubjects.S[id1].HasTextbook)
                 {
-                    perfectWeight -= currentSubjects[id1].WeightG;
-                    currentSubjects.RemoveAt(id1);
+                    perfectWeight -= currentSubjects.S[id1].WeightG;
+                    currentSubjects.S.RemoveAt(id1);
 
                     id1--;
                     continue;
                 }
-                if (!currentSubjects[id1].CanBeSplit)
+                if (!currentSubjects.S[id1].CanBeSplit)
                 {
-                    unsplittableTextbooks.Add(currentSubjects[id1]);
+                    unsplittableTextbooks.Add(currentSubjects.S[id1]);
 
-                    perfectWeight -= currentSubjects[id1].WeightG;
-                    currentSubjects.RemoveAt(id1);
+                    perfectWeight -= currentSubjects.S[id1].WeightG;
+                    currentSubjects.S.RemoveAt(id1);
 
                     id1--;
                     continue;
                 }
                 for (var id2 = id1 + 1; id2 < currentSubjects.Count; id2++)
                 {
-                    if (currentSubjects[id1].Id == currentSubjects[id2].Id)
+                    if (currentSubjects.S[id1].Id == currentSubjects.S[id2].Id)
                     { 
-                        perfectWeight -= currentSubjects[id1].WeightG;
-                        currentSubjects.RemoveAt(id1);
+                        perfectWeight -= currentSubjects.S[id1].WeightG;
+                        currentSubjects.S.RemoveAt(id1);
 
                         id1--;
                         id2 += currentSubjects.Count;
@@ -132,7 +117,7 @@ namespace BotFix
             perfectWeight /= 2;
 
             
-            List<Subject> sortedUniqueSubjects = DaySchedule.Sorted(currentSubjects, SortType.LowerWeightFirst);
+            List<Subject> sortedUniqueSubjects = DaySchedule.Sorted(currentSubjects.Subjects, SortType.LowerWeightFirst);
 
             var heaviestSortedId = sortedUniqueSubjects.Count - 1;
             if (heaviestSortedId >= 0 && sortedUniqueSubjects[heaviestSortedId].WeightG >= perfectWeight)
@@ -143,8 +128,8 @@ namespace BotFix
                 bitMaskResult = 1 << heaviestSortedId;
                 return 
                 [
-                    CombineLists(  unsplittableTextbooks, [ heaviest ]  ),
-                    CombineLists(  unsplittableTextbooks, sortedUniqueSubjects  )
+                    new ( CombineLists(   unsplittableTextbooks, [ heaviest ]   ) ),
+                    new ( CombineLists(   unsplittableTextbooks, sortedUniqueSubjects   ) )
                 ];  
             }
 
@@ -158,11 +143,11 @@ namespace BotFix
                 catch
                 {
                     bitMaskResult = 0;
-                    return [ [] ];
+                    return [];
                 }
             }
         }
-        static public List<List<Subject>> NextFor2(List<Subject> currentSubjects, bool throwException = true) 
+        static public List<DaySchedule> NextFor2(DaySchedule currentSubjects, bool throwException = true) 
             => NextFor2(currentSubjects, out _, throwException);
 
 
@@ -174,16 +159,16 @@ namespace BotFix
 
             return combined;
         }
-        static private List<List<Subject>> SplitCombineLogic(List<Subject> allUnique, float perfectWeight, out Int32 bitMaskOfBestIteration, List<Subject> unsplittableTextbooks)
+        static private List<DaySchedule> SplitCombineLogic(List<Subject> allUnique, float perfectWeight, out Int32 bitMaskOfBestIteration, List<Subject> unsplittableTextbooks)
         {
-            List<List<Subject>> split = FilteredDataSplitFor2(allUnique, perfectWeight, out bitMaskOfBestIteration);
+            List<DaySchedule> split = FilteredDataSplitFor2(allUnique, perfectWeight, out bitMaskOfBestIteration);
 
-            split[0].AddRange(unsplittableTextbooks);
-            split[1].AddRange(unsplittableTextbooks);
+            split[0].S.AddRange(unsplittableTextbooks);
+            split[1].S.AddRange(unsplittableTextbooks);
 
             return split;
         }
-        static private List<List<Subject>> FilteredDataSplitFor2(List<Subject> allUnique, float perfectWeight, out Int32 bitMaskOfBestIteration)
+        static private List<DaySchedule> FilteredDataSplitFor2(List<Subject> allUnique, float perfectWeight, out Int32 bitMaskOfBestIteration)
         {
             float minDiff = float.MaxValue, curCalcSum;
             Int32 curIterationBitMask, subjectCount = allUnique.Count;
@@ -239,7 +224,7 @@ namespace BotFix
             }
 
 
-            return [user1, user2];
+            return [ new (user1), new (user2) ];
         }
     }
 }

@@ -134,6 +134,7 @@ namespace BotFix
             _subjects.AddRange(daySchedule.Subjects);
             _weekDay = daySchedule.WeekDay;
         }
+        public DaySchedule() { }
         static public List<DaySchedule> Convert(List<List<Subject>> subjects)
         {
             List<DaySchedule> schedules = [];
@@ -149,10 +150,13 @@ namespace BotFix
         }
 
 
+
         public List<Subject> Subjects => _subjects;
         public List<Subject> S => _subjects;    //  Short alias
         public Int32 Count => _subjects.Count;
+        public Int32 C => _subjects.Count;      //  Short alias
         public Weekday WeekDay => _weekDay;
+        public Weekday W => _weekDay;           //  Short alias
 
 
 
