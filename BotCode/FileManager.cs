@@ -48,7 +48,19 @@ namespace BotFix
         public void Dispose()
         {
             string json = JsonConvert.SerializeObject(MyUsers, Formatting.Indented);
-            File.WriteAllText(way, json);
+            bool wait = true;
+            while (wait)
+            {
+                try
+                {
+                    File.WriteAllText(way, json);
+                    wait = false;
+                }
+                catch
+                {
+                    Console.WriteLine("waiting!");
+                }
+            }
         }
 
     }
