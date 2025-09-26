@@ -1,66 +1,120 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace BotFix
 {
-    internal class TelegramController
+    internal class TimeController
     {
-        public delegate void GetMessageEvent(string messageText, long userId);
-
-        public event GetMessageEvent? OnEventOccurred;
-
-        private string _botToken;
-        private HttpClient _httpClient;
-        private long offset = 0;
-        public TelegramController(string token) 
+        private DateTime targetTime;
+        private Timer checkTimer;
+        private bool isFunctionExecutedToday = false;
+        private TelegramController tgc;
+        public TimeController(float time, TelegramController tgControl) 
         {
-            _botToken = token;
-            _httpClient = new HttpClient();
-            _httpClient.BaseAddress = new Uri($"https://api.telegram.org/bot{_botToken}/");
+            //Console.WriteLine(DateTime.Now);
+            targetTime = DateTime.Today.AddHours(time);
+
+            checkTimer = new Timer(CheckTime, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+
+            tgc = tgControl;
         }
 
-        public async void MessageChecker()
+        private void CheckTime(object state)
         {
-            try
+            DateTime now = DateTime.Now;
+
+            if (!isFunctionExecutedToday && now >= targetTime)
             {
-                while (true)
+                mainFunc();
+
+                isFunctionExecutedToday = true;
+
+                targetTime = targetTime.AddDays(1);
+            }
+
+            if (now.Hour == 0 && now.Minute == 0)
+            {
+                isFunctionExecutedToday = false;
+            }
+        }
+
+        private void mainFunc()
+        {
+            using (var f = new FileManager("/Users.json"))
+            {
+                foreach (var i in f.MyUsers)
                 {
-                    var response = await _httpClient.GetAsync($"getUpdates?offset={offset}&timeout=1");
-                    var strReader = response.Content.ReadAsStringAsync();
+                    var r = i.MyLessonsList;
+                    int dayNumber = (int)DateTime.Now.DayOfWeek;
 
-                    using (var document = JsonDocument.Parse(strReader.Result))
+                    var LessonsLst = SplitMyString(r);
+
+                    List<DaySchedule> splitResult = Split.NextFor2(LessonsLst, IntToWeekday(dayNumber));
+
+                    string res = "";
+                    var lessns = splitResult[(i.guest ? 0 : 1)];
+                    int count = 0;
+
+                    for (var j = 1; j <= lessns.Count; j++)
                     {
-                        foreach (var update in document.RootElement.GetProperty("result").EnumerateArray())
-                        {
-                            offset = update.GetProperty("update_id").GetInt32() + 1;
+                        res += $"{j}: {lessns.S[j - 1].Title}, {lessns.S[j - 1].WeightG}g\n";
+                        count = j;
+                    }
+                    res += $"у тебя сегодня с собой целых {count.ToString()} учебников!";
 
-                            OnEventOccurred.Invoke(update.GetProperty("message").GetProperty("text").GetString(), update.GetProperty("message").GetProperty("from").GetProperty("id").GetInt64());
-                        }
+                    if (LessonsLst.Count >= dayNumber)
+                    {
+                        tgc.SendMessage($"{i.usrName}, вот твое расписание на завтрашний день!\n{outp}", i.userID);
                     }
                 }
             }
-            catch (HttpRequestException ex)
-            {
-                Console.WriteLine($"Ошибка при отправке сообщения: {ex.Message}");
-            }
         }
 
-        public void SendMessage(string massage, long chatID)
+        public void Dispose()
         {
-            var playload = new
+            checkTimer?.Dispose();
+        }
+
+        static private Weekday IntToWeekday(int input)
+        {
+            return input switch
             {
-                chat_id = chatID,
-                text = massage
+                1 => Weekday.Monday,
+                2 => Weekday.Tuesday,
+                3 => Weekday.Wednesday,
+                4 => Weekday.Thursday,
+                5 => Weekday.Friday,
+                6 => Weekday.Saturday,
+                0 => Weekday.Sunday,
+                _ => Weekday.Undefined
             };
+        }
 
-            var responge = _httpClient.PostAsync(
-                $"sendMessage",
-                new StringContent(JsonConvert.SerializeObject(playload), Encoding.UTF8, "application/json")
-                );
-
-            responge.Wait();
+        private List<DaySchedule> SplitMyString(string text)
+        {
+            List<DaySchedule> LessonsLst = [];
+            List<string> a = text.Split("*\n").ToList<string>();
+            for (int j = 0; j < a.Count; j++)
+            {
+                foreach (string lesson in a[j].Split('\n'))
+                {
+                    DaySchedule c = new DaySchedule();
+                    if (lesson.Contains(' '))
+                    {
+                        var b = lesson.Split(' ');
+                        c.AddSubject(new Subject(b[0], uint.Parse(b[1])));
+                    }
+                    else
+                    {
+                        c.AddSubject(new Subject(lesson));
+                    }
+                    LessonsLst.Add(c);
+                }
+            }
+            return LessonsLst;
         }
     }
 }
