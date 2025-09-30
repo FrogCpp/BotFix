@@ -19,7 +19,7 @@ namespace BotFix
         public string FriendKey;
         public string usrName;
         public bool guest;
-        public List<List<Subject>> MyLessonsList = new List<List<Subject>>(0);
+        public string MyLessonsList;
 
         static private string GenerateRandomString()
         {
@@ -148,27 +148,7 @@ namespace BotFix
                     us = usv[0];
                     if (us.registrSteps == 3)
                     {
-                        int day = 0;
-                        List<List<Subject>> LessonsLst = new List<List<Subject>>(0);
-                        List<string> a = text.Split("*\n").ToList<string>();
-                        for (int i = 0; i < a.Count; i++)
-                        {
-                            List<Subject> c = new List<Subject>();
-                            foreach (string lesson in a[i].Split('\n'))
-                            {
-                                if (lesson.Contains(' '))
-                                {
-                                    var b = lesson.Split(' ');
-                                    c.Add(new Subject(b[0], uint.Parse(b[1])));
-                                }
-                                else
-                                {
-                                    c.Add(new Subject(lesson));
-                                }
-                            }
-                            LessonsLst.Add(c);
-                        }
-                        us.MyLessonsList = LessonsLst;
+                        us.MyLessonsList = text;
                         _tgMethods.SendMessage($"с созданием расписания справились, молодец! но если молодец не до конца, и при вводе сделал ошибку, то пропиши /fail это сотрет твою учетку, и тебе придется заново создовать ее. Если гость уже зарегался до тебя, и успел ввести твой ключь, то пусть пропишет команду /setFriendKey и заменит себе ключь. (в отличии от остальных комманд, здесь нужно указать аргумент (сам ключь) через пробел после самой комманды (примерно так /setFriendKey Кл:Ю:Чь))\n\nтебе остается только настроить время!", uID);
                     }
                 }

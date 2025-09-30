@@ -18,15 +18,17 @@ namespace BotFix
     public enum SortType
     {
         HigherWeightFirst = -1,
-        LowerWeightFirst  = 1,
+        LowerWeightFirst = 1,
     }
+
+
 
     public class Subject
     {
         private Int32  _id;
         private string _title;
         private UInt32 _weightG;
-        private bool   _hasTextbook, _canBeSplit;
+        private bool _hasTextbook, _canBeSplit;
 
 
         public Subject(string title, UInt32 weightG, bool hasTextBook = true, bool canBeSplit = true)
@@ -108,8 +110,9 @@ namespace BotFix
         public string Title => _title;
         public UInt32 WeightG => _weightG;
         public bool HasTextbook => _hasTextbook;
-        public bool CanBeSplit => _canBeSplit;
+        public bool CanBeSplit  => _canBeSplit;
     }
+
 
 
     public class DaySchedule
@@ -139,8 +142,8 @@ namespace BotFix
         {
             List<DaySchedule> schedules = [];
             for (var i = 0; i < subjects.Count; i++)
-                schedules.Add(new (subjects[i]));
-            
+                schedules.Add(new(subjects[i]));
+
             return schedules;
         }
         public void FullReset()
@@ -182,12 +185,12 @@ namespace BotFix
             return min;
         }
         public UInt32 Min => MinWeightG();      //  Short alias
-        public float AverageWeightG()
+        public float  AverageWeightG()
         {
             if (_subjects.Count == 0) return 0;
             return (float)TotalWeightG() / TextbookCount();
         }
-        public float Avg => AverageWeightG();   //  Short alias
+        public float  Avg => AverageWeightG();   //  Short alias
         public UInt32 TotalWeightG()
         {
             UInt32 total = 0;
@@ -195,7 +198,7 @@ namespace BotFix
             return total;
         }
         public UInt32 Total => TotalWeightG();  //  Short alias
-        public Int32 TotalSignedWeightG() => (Int32)TotalWeightG();
+        public Int32  TotalSignedWeightG() => (Int32)TotalWeightG();
         public Int32  TotalSigned => (Int32)TotalWeightG();  //  Short alias
 
 
