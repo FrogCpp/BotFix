@@ -41,7 +41,50 @@ namespace BotFix
             }
         }
 
-        static private Weekday intToWeekday(int input)
+        private void mainFunc()
+        {
+            using (var f = new FileManager("/Users.json"))
+            {
+                foreach (var i in f.MyUsers)
+                {
+                    var a = i.MyLessonsList;
+                    int dayNumber = ((int)DateTime.Now.DayOfWeek + 6) % 7;
+
+                    List<DaySchedule> splited = SplitMyString(a);
+                    for (int ge = 0; ge < splited.Count; ge++)
+                    {
+                        for (int gah = 0; gah < splited[ge].Count; gah++)
+                        {
+                            var subject = splited[ge].S[gah];
+                            Console.WriteLine(subject.Title);
+                        }
+                    }
+
+                    List<DaySchedule> splitResult = Split.NextFor2(splited, IntToWeekday(dayNumber));
+
+                    for (int yte = 0; yte < splitResult.Count; yte++)
+                    {
+                        Console.WriteLine(splitResult[yte].Count);
+                        for (int gah = 0; gah < splitResult[yte].Count; gah++)
+                        {
+                            var subject = splitResult[yte].S[gah];
+                            Console.WriteLine(subject.Title);
+                            //string title = subject.Title;
+                            //uint weight = subject.WeightG;
+                            //Console.WriteLine($"- {title} [{weight}г]");
+                        }
+                    }
+                    //tgc.SendMessage($"{i.usrName}, вот твое расписание на завтрашний день!\n*леша не забудь починить это, после того, как егор исправит сплитер*", i.userID);
+                }
+            }
+        }
+
+        public void Dispose()
+        {
+            checkTimer?.Dispose();
+        }
+
+        static private Weekday IntToWeekday(int input)
         {
             return input switch
             {
@@ -54,11 +97,6 @@ namespace BotFix
                 0 => Weekday.Sunday,
                 _ => Weekday.Undefined
             };
-        }
-
-        public void Dispose()
-        {
-            checkTimer?.Dispose();
         }
 
         private List<DaySchedule> SplitMyString(string text)
@@ -74,10 +112,12 @@ namespace BotFix
                     {
                         var b = lesson.Split(' ');
                         c.AddSubject(new Subject(b[0], uint.Parse(b[1])));
+                        Console.WriteLine($"{b[0]}, {b[1]}g");
                     }
                     else
                     {
                         c.AddSubject(new Subject(lesson));
+                        Console.WriteLine($"{lesson}, -1g");
                     }
                     LessonsLst.Add(c);
                 }
