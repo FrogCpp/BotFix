@@ -41,33 +41,7 @@ namespace BotFix
             }
         }
 
-        private void mainFunc()
-        {
-            using (var f = new FileManager("/Users.json"))
-            {
-                foreach (var i in f.MyUsers)
-                {
-                    var a = i.MyLessonsList;
-                    int dayNumber = ((int)DateTime.Now.DayOfWeek + 6) % 7;
-                    if (a.Count >= dayNumber)
-                    {
-                        Console.WriteLine(a);
-                    }
-
-                    if (LessonsLst.Count >= dayNumber)
-                    {
-                        tgc.SendMessage($"{i.usrName}, вот твое расписание на завтрашний день!\n*леша не забудь починить это, после того, как егор исправит сплитер*", i.userID);
-                    }
-                }
-            }
-        }
-
-        public void Dispose()
-        {
-            checkTimer?.Dispose();
-        }
-
-        static private Weekday IntToWeekday(int input)
+        static private Weekday intToWeekday(int input)
         {
             return input switch
             {
@@ -80,6 +54,11 @@ namespace BotFix
                 0 => Weekday.Sunday,
                 _ => Weekday.Undefined
             };
+        }
+
+        public void Dispose()
+        {
+            checkTimer?.Dispose();
         }
 
         private List<DaySchedule> SplitMyString(string text)

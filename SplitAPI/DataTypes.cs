@@ -26,15 +26,34 @@ namespace BotFix
     public class Subject
     {
         private Int32  _id;
-        private string _title = "";
+        private string _title;
         private UInt32 _weightG;
         private bool _hasTextbook, _canBeSplit;
 
 
         public Subject(string title, UInt32 weightG, bool hasTextBook = true, bool canBeSplit = true)
-            => ReInit(title, weightG, hasTextBook, canBeSplit);
-        public Subject(string title) => ReInit(title, 0, false, false);
-        public Subject() => _title = "Undefined";
+        {
+            _title = title;
+            _weightG = weightG;
+
+            _hasTextbook = hasTextBook;
+            _canBeSplit = canBeSplit;
+
+            AssignSubjectId();
+        }
+        public Subject(string title)
+        {
+            _title = title;
+            _weightG = 0;
+            _hasTextbook = false;
+            _canBeSplit = false;
+
+            AssignSubjectId();
+        }
+        public Subject() 
+        {
+            _title = "Undefined";
+        }
         public void ReInit(string title, UInt32 weightG, bool hasTextBook = true, bool canBeSplit = true)
         {
             _title = title;
@@ -45,7 +64,6 @@ namespace BotFix
 
             AssignSubjectId();
         }
-        public void ReInit(string title) => ReInit(title, 0, false, false);
 
 
 
@@ -64,27 +82,31 @@ namespace BotFix
 
 
 
-        private void AssignSubjectId() => _id = AssignSubjectId(_title);
-        static public Int32 AssignSubjectId(string title)
+        private void AssignSubjectId() => AssignSubjectId(_title);
+        private void AssignSubjectId(string subjectTitle)
         {
-            var uniqueCount = ValidSubjects.Titles.Count;
+            _id = 0;
 
+            var uniqueCount = ValidSubjects.Titles.Count;
             for (var unique = 0; unique < uniqueCount; unique++)
             {
                 var localCount = ValidSubjects.Titles[unique].Count;
                 for (var local = 0; local < localCount; local++)
                 {
-                    if (title.Trim().ToLower() == ValidSubjects.Titles[unique][local])
-                        return unique;
+                    if (subjectTitle.Trim().ToLower() == ValidSubjects.Titles[unique][local])
+                    {
+                        _id = unique;
+
+                        local += localCount;   //  After successfull id match
+                        unique += uniqueCount;  //  Exit both seacrh loops
+                    }
                 }
             }
-
-            return -1;
         }
 
 
 
-        public Int32  Id => _id;
+        public Int32 Id => _id;
         public string Title => _title;
         public UInt32 WeightG => _weightG;
         public bool HasTextbook => _hasTextbook;
