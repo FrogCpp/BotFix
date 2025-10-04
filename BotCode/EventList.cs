@@ -41,7 +41,7 @@ namespace BotFix
             if (text != "/start")
                 return;
 
-            using (var f = new FileManager("/Users.json"))
+            using (var f = new FileManager())
             {
                 var file = f.MyUsers;
                 if (!file.Any(user => user.userID == uID))
@@ -63,7 +63,7 @@ namespace BotFix
         {
             if (text[0] == '/')
                 return;
-            using (var f = new FileManager("/Users.json"))
+            using (var f = new FileManager())
             {
                 UserSettings us;
                 if (f.TryGetUser(uID, out var usv)){
@@ -82,7 +82,7 @@ namespace BotFix
 
         public void GetFriend(string text, long uID)
         {
-            using (var f = new FileManager("/Users.json"))
+            using (var f = new FileManager())
             {
                 UserSettings us;
                 if (f.TryGetUser(uID, out var usv))
@@ -140,7 +140,7 @@ namespace BotFix
             if (text[0] == '/')
                 return;
 
-            using (var f = new FileManager("/Users.json"))
+            using (var f = new FileManager())
             {
                 UserSettings us;
                 if (f.TryGetUser(uID, out var usv))
@@ -149,6 +149,7 @@ namespace BotFix
                     if (us.registrSteps == 3)
                     {
                         us.MyLessonsList = text;
+                        us.registrSteps = 4;
                         _tgMethods.SendMessage($"с созданием расписания справились, молодец! но если молодец не до конца, и при вводе сделал ошибку, то пропиши /fail это сотрет твою учетку, и тебе придется заново создовать ее. Если гость уже зарегался до тебя, и успел ввести твой ключь, то пусть пропишет команду /setFriendKey и заменит себе ключь. (в отличии от остальных комманд, здесь нужно указать аргумент (сам ключь) через пробел после самой комманды (примерно так /setFriendKey Кл:Ю:Чь))\n\nтебе остается только настроить время!", uID);
                     }
                 }
@@ -177,7 +178,7 @@ namespace BotFix
         {
             if (text != "/fail")
                 return;
-            using (var f = new FileManager("/Users.json"))
+            using (var f = new FileManager())
             {
                 UserSettings us;
                 if (f.TryGetUser(uID, out var usv))
@@ -199,7 +200,7 @@ namespace BotFix
 
             string[] tx = text.Split(' ');
             _tgMethods.SendMessage($"Что же, похоже твой админ играл с регестрацией и проиграл, либо ты неправельно вставил ключь дружбы. Ничего страшного, бывает, обнови его просто отправив нужный ключь сообщением.\nНе забывай, что сколько сильно ты бы не поломал свою учетку, все всегда можно исправить (достаточно прописать /fail )\n;)", uID);
-            using (var f = new FileManager("/Users.json"))
+            using (var f = new FileManager())
             {
                 UserSettings us;
                 if (f.TryGetUser(uID, out var usv))
@@ -232,11 +233,6 @@ namespace BotFix
                     }
                 }
             }
-        }
-
-        public void Test(string text, long uID)
-        {
-            Console.WriteLine($"{uID}: {text}");
         }
     }
 }

@@ -35,8 +35,15 @@ namespace BotFix
                         foreach (var update in document.RootElement.GetProperty("result").EnumerateArray())
                         {
                             offset = update.GetProperty("update_id").GetInt32() + 1;
-
-                            OnEventOccurred.Invoke(update.GetProperty("message").GetProperty("text").GetString(), update.GetProperty("message").GetProperty("from").GetProperty("id").GetInt64());
+                            try
+                            {
+                                Console.WriteLine($"{update.GetProperty("message").GetProperty("from")}: {update.GetProperty("message").GetProperty("text")}");
+                                OnEventOccurred.Invoke(update.GetProperty("message").GetProperty("text").GetString(), update.GetProperty("message").GetProperty("from").GetProperty("id").GetInt64());
+                            }
+                            catch
+                            {
+                                Console.WriteLine($"Bug!");
+                            }
                         }
                     }
                 }
