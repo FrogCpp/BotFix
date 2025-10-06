@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -43,15 +44,59 @@ namespace BotFix
 
         private void mainFunc()
         {
-            using (var f = new FileManager("/Users.json"))
+            using (var f = new FileManager())
             {
                 foreach (var i in f.MyUsers)
                 {
-                    var a = i.MyLessonsList;
-                    int dayNumber = ((int)DateTime.Now.DayOfWeek + 6) % 7;
-                    if (a.Count >= dayNumber)
+                    string a = null;
+                    if (i.guest)
                     {
-                        tgc.SendMessage($"{i.usrName}, вот твое расписание на завтрашний день!\n*леша не забудь починить это, после того, как егор исправит сплитер*", i.userID);
+                        if(f.TryGetUser(i.FriendKey, out var usrs))
+                        {
+                            foreach(var ex in usrs)
+                            {
+                                if (ex != i)
+                                {
+                                    a = ex.MyLessonsList;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        a = i.MyLessonsList;
+                    }
+
+                    if (a == null)
+                        continue;
+                    int dayNumber = (int)DateTime.Now.DayOfWeek;
+
+                    try
+                    {
+                        List<DaySchedule> splited = SplitMyString(a);
+
+
+                        //List<DaySchedule> splitResult = Split.NextFor2(splited, IntToWeekday(dayNumber));
+                        List<DaySchedule> splitResult = Split.NextFor2(splited, IntToWeekday(1));
+
+
+                        string outp = "\n";
+
+                        int yte = (i.guest ? 1 : 0);
+
+                        for (int gah = 0; gah < splitResult[yte].Count; gah++)
+                        {
+                            var subject = splitResult[yte].S[gah];
+                            string title = subject.Title;
+                            uint weight = subject.WeightG;
+                            outp += $"- {title} [{weight}г]\n";
+                        }
+                        tgc.SendMessage($"{i.usrName}, вот твое расписание на завтрашний день!{outp}", i.userID);
+                    }
+                    catch
+                    {
+                        tgc.SendMessage($"{i.usrName}, похоже, ты плохо заполнил поле, или сделал это некорректно (либо твой админ хаха)", i.userID);
+                        continue;
                     }
                 }
             }
@@ -60,6 +105,45 @@ namespace BotFix
         public void Dispose()
         {
             checkTimer?.Dispose();
+        }
+
+        static private Weekday IntToWeekday(int input)
+        {
+            return input switch
+            {
+                1 => Weekday.Monday,
+                2 => Weekday.Tuesday,
+                3 => Weekday.Wednesday,
+                4 => Weekday.Thursday,
+                5 => Weekday.Friday,
+                6 => Weekday.Saturday,
+                0 => Weekday.Sunday,
+                _ => Weekday.Undefined
+            };
+        }
+
+        private List<DaySchedule> SplitMyString(string text)
+        {
+            List<DaySchedule> LessonsLst = [];
+            List<string> a = text.Split("*\n").ToList<string>();
+            for (int j = 0; j < a.Count; j++)
+            {
+                DaySchedule c = new DaySchedule();
+                foreach (string lesson in a[j].Split('\n'))
+                {
+                    if (lesson.Contains(' '))
+                    {
+                        var b = lesson.Split(' ');
+                        c.AddSubject(new Subject(b[0], uint.Parse(b[1])));
+                    }
+                    else
+                    {
+                        c.AddSubject(new Subject(lesson));
+                    }
+                }
+                LessonsLst.Add(c);
+            }
+            return LessonsLst;
         }
     }
 }

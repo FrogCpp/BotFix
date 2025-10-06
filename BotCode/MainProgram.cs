@@ -9,13 +9,12 @@ namespace BotFix
             var a = new TelegramController("8042101976:AAGcVCALZxsK0hjzSxuB-yr4gbQoFeMIpFA");
             a.MessageChecker();
             var ev = new EventList(a);
-            var time = new TimeController(18.0f, a);
-            a.OnEventOccurred += ev.Test;
+            var time = new TimeController(15.00f, a);
             a.OnEventOccurred += ev.fKey;
             a.OnEventOccurred += ev.Fuckup;
             a.OnEventOccurred += ev.GetLessonsList;
             a.OnEventOccurred += ev.GetFriend;
-            a.OnEventOccurred += ev.GetUserName; // здесь важен порядок объявления. Мы идем с конца в начало.
+            a.OnEventOccurred += ev.GetUserName;
             a.OnEventOccurred += ev.startE;
         }
     }

@@ -1,12 +1,13 @@
 ﻿using Newtonsoft.Json;
+using System.Reflection;
 
 namespace BotFix
 {
     internal class FileManager : IDisposable
     {
         public List<UserSettings> MyUsers;
-        private string way;
-        public FileManager(string way)
+        private string way = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\Users.Json";
+        public FileManager()
         {
             try
             {
@@ -18,8 +19,7 @@ namespace BotFix
             {
                 MyUsers = new List<UserSettings>();
             }
-
-            this.way = way;
+            return;
         }
 
         public bool TryGetUser(long userId, out UserSettings[] users)
@@ -48,7 +48,19 @@ namespace BotFix
         public void Dispose()
         {
             string json = JsonConvert.SerializeObject(MyUsers, Formatting.Indented);
-            File.WriteAllText(way, json);
+            bool wait = true;
+            while (wait)
+            {
+                try
+                {
+                    File.WriteAllText(way, json);
+                    wait = false;
+                }
+                catch
+                {
+                    Console.WriteLine("waiting!");
+                }
+            }
         }
 
     }
