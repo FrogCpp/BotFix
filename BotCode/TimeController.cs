@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -41,48 +42,72 @@ namespace BotFix
             }
         }
 
-        public void mainFunc()
+        private void mainFunc()
         {
-            Console.WriteLine("Start!");
-            using (var f = new FileManager("/Users.json"))
+            using (var f = new FileManager())
             {
-                Console.WriteLine(f);
                 foreach (var i in f.MyUsers)
                 {
-                    Console.WriteLine(i.usrName);
-                    List<List<Subject>> a = [];
-                    a.AddRange(i.MyLessonsList);
-                    int dayNumber = (int)DateTime.Now.DayOfWeek;
-                    if (a.Count >= dayNumber)
+                    string a = null;
+                    if (i.guest)
                     {
-                        foreach (var t in i.MyLessonsList)
+                        if(f.TryGetUser(i.FriendKey, out var usrs))
                         {
-                            Console.WriteLine(t.Count);
+                            foreach(var ex in usrs)
+                            {
+                                if (ex != i)
+                                {
+                                    a = ex.MyLessonsList;
+                                }
+                            }
                         }
-                        List<DaySchedule> splitResult = DaySchedule.Convert(Split.NextFor2(a, intToWeekday(dayNumber)));
-                        Console.WriteLine("========");
-                        foreach (var t in i.MyLessonsList)
+                    }
+                    else
+                    {
+                        a = i.MyLessonsList;
+                    }
+
+                    if (a == null)
+                        continue;
+                    int dayNumber = (int)DateTime.Now.DayOfWeek;
+
+                    try
+                    {
+                        List<DaySchedule> splited = SplitMyString(a);
+
+
+                        //List<DaySchedule> splitResult = Split.NextFor2(splited, IntToWeekday(dayNumber));
+                        List<DaySchedule> splitResult = Split.NextFor2(splited, IntToWeekday(1));
+
+
+                        string outp = "\n";
+
+                        int yte = (i.guest ? 1 : 0);
+
+                        for (int gah = 0; gah < splitResult[yte].Count; gah++)
                         {
-                            Console.WriteLine(t.Count);
+                            var subject = splitResult[yte].S[gah];
+                            string title = subject.Title;
+                            uint weight = subject.WeightG;
+                            outp += $"- {title} [{weight}г]\n";
                         }
-                        string outp = "";
-                        int userNum = (i.guest ? 0 : 1);
-                        int count = 0;
-                        for (var j = 1; j <= splitResult[userNum].Count; j++)
-                        {
-                            Console.WriteLine(splitResult[userNum].S[j - 1].Title);
-                            outp += $"{j}: {splitResult[userNum].S[j - 1].Title}, {splitResult[userNum].S[j - 1].WeightG}g\n";
-                            count = j;
-                        }
-                        outp += $"у тебя сегодня с собой целых {count.ToString()} учебников!";
-                        tgc.SendMessage($"{i.usrName}, вот твое расписание на завтрашний день!\n{outp}", i.userID);
-                        Console.WriteLine("End!");
+                        tgc.SendMessage($"{i.usrName}, вот твое расписание на завтрашний день!{outp}", i.userID);
+                    }
+                    catch
+                    {
+                        tgc.SendMessage($"{i.usrName}, похоже, ты плохо заполнил поле, или сделал это некорректно (либо твой админ хаха)", i.userID);
+                        continue;
                     }
                 }
             }
         }
 
-        static private Weekday intToWeekday(int input)
+        public void Dispose()
+        {
+            checkTimer?.Dispose();
+        }
+
+        static private Weekday IntToWeekday(int input)
         {
             return input switch
             {
@@ -97,9 +122,28 @@ namespace BotFix
             };
         }
 
-        public void Dispose()
+        private List<DaySchedule> SplitMyString(string text)
         {
-            checkTimer?.Dispose();
+            List<DaySchedule> LessonsLst = [];
+            List<string> a = text.Split("*\n").ToList<string>();
+            for (int j = 0; j < a.Count; j++)
+            {
+                DaySchedule c = new DaySchedule();
+                foreach (string lesson in a[j].Split('\n'))
+                {
+                    if (lesson.Contains(' '))
+                    {
+                        var b = lesson.Split(' ');
+                        c.AddSubject(new Subject(b[0], uint.Parse(b[1])));
+                    }
+                    else
+                    {
+                        c.AddSubject(new Subject(lesson));
+                    }
+                }
+                LessonsLst.Add(c);
+            }
+            return LessonsLst;
         }
     }
 }
