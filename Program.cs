@@ -18,7 +18,10 @@ namespace BotFix
 
             MainProgram.Run();
 
-            Console.ReadLine();
+            while (true)
+            {
+                Thread.Sleep(999999);
+            }
         }
     }
 }

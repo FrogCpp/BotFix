@@ -10,6 +10,7 @@ namespace BotFix
             a.MessageChecker();
             var ev = new EventList(a);
             var time = new TimeController(a);
+            a.OnEventOccurred += ev.neofetch;
             a.OnEventOccurred += ev.fKey;
             a.OnEventOccurred += ev.Fuckup;
             a.OnEventOccurred += ev.GetTime;
