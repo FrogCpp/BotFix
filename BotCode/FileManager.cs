@@ -6,7 +6,7 @@ namespace BotFix
     internal class FileManager : IDisposable
     {
         public List<UserSettings> MyUsers;
-        private string way = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\Users.Json";
+        private string way = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/users.json";
         public FileManager()
         {
             try

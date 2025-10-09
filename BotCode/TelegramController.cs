@@ -54,12 +54,13 @@ namespace BotFix
             }
         }
 
-        public void SendMessage(string massage, long chatID)
+        public void SendMessage(string message, long chatID)
         {
+            Console.WriteLine(message);
             var playload = new
             {
                 chat_id = chatID,
-                text = massage
+                text = message
             };
 
             var responge = _httpClient.PostAsync(
