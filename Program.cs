@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Reflection;
-
-using static BotFix.SplitDemo;
+using System.Text;
 using static BotFix.MainProgram;
+using static BotFix.SplitDemo;
 
 
 
@@ -12,6 +12,8 @@ namespace BotFix
     {
         static void Main()
         {
+            Console.OutputEncoding = Encoding.UTF8;
+
             //SplitDemo.Run();
 
             MainProgram.Run();

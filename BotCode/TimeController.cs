@@ -48,23 +48,19 @@ namespace BotFix
             {
                 foreach (var i in f.MyUsers)
                 {
-                    string a = null;
+                    string a = i.MyLessonsList; ;
                     if (i.guest)
                     {
                         if(f.TryGetUser(i.FriendKey, out var usrs))
                         {
                             foreach(var ex in usrs)
                             {
-                                if (ex != i)
+                                if (!ex.guest)
                                 {
                                     a = ex.MyLessonsList;
                                 }
                             }
                         }
-                    }
-                    else
-                    {
-                        a = i.MyLessonsList;
                     }
 
                     if (a == null)
@@ -76,8 +72,7 @@ namespace BotFix
                         List<DaySchedule> splited = SplitMyString(a);
 
 
-                        //List<DaySchedule> splitResult = Split.NextFor2(splited, IntToWeekday(dayNumber));
-                        List<DaySchedule> splitResult = Split.NextFor2(splited, IntToWeekday(1));
+                        List<DaySchedule> splitResult = Split.NextFor2(splited, IntToWeekday(dayNumber));
 
 
                         string outp = "\n";
@@ -93,9 +88,10 @@ namespace BotFix
                         }
                         tgc.SendMessage($"{i.usrName}, вот твое расписание на завтрашний день!{outp}", i.userID);
                     }
-                    catch
+                    catch (Exception e)
                     {
-                        tgc.SendMessage($"{i.usrName}, похоже, ты плохо заполнил поле, или сделал это некорректно (либо твой админ хаха)", i.userID);
+                        Console.WriteLine(e.Message);
+                        tgc.SendMessage($"{i.usrName}, похоже, ты плохо заполнил поле, или сделал это некорректно (либо твой админ хаха)\nЕсли ты умный, и можешь сам все починить, то вот ошибка в твоем расписании:\n{e.Message}", i.userID);
                         continue;
                     }
                 }
@@ -134,6 +130,10 @@ namespace BotFix
                     if (lesson.Contains(' '))
                     {
                         var b = lesson.Split(' ');
+                        foreach(var bb in b)
+                        {
+                            Console.WriteLine(bb);
+                        }
                         c.AddSubject(new Subject(b[0], uint.Parse(b[1])));
                     }
                     else
