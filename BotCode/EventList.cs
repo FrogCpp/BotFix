@@ -174,8 +174,10 @@ namespace BotFix
                     {
                         try
                         {
-                            us.Time = DateTime.Parse(text);
+                            var t = DateTime.Today;
+                            us.Time = t + DateTime.Parse(text).TimeOfDay;
                             _tgMethods.SendMessage($"Умничка {us.usrName}, теперь жди {us.Time} и тогда тебе должно прийти расписание.", uID);
+                            us.registrSteps++;
                         }
                         catch (Exception e)
                         {

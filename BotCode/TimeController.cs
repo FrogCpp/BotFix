@@ -132,10 +132,6 @@ namespace BotFix
                     if (lesson.Contains(' '))
                     {
                         var b = lesson.Split(' ');
-                        foreach(var bb in b)
-                        {
-                            Console.WriteLine(bb);
-                        }
                         c.AddSubject(new Subject(b[0], uint.Parse(b[1])));
                     }
                     else
