@@ -56,7 +56,6 @@ namespace BotFix
 
         public void SendMessage(string message, long chatID)
         {
-            Console.WriteLine(message);
             var playload = new
             {
                 chat_id = chatID,

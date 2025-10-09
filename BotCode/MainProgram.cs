@@ -9,9 +9,10 @@ namespace BotFix
             var a = new TelegramController("8042101976:AAGcVCALZxsK0hjzSxuB-yr4gbQoFeMIpFA");
             a.MessageChecker();
             var ev = new EventList(a);
-            var time = new TimeController(15.00f, a);
+            var time = new TimeController(a);
             a.OnEventOccurred += ev.fKey;
             a.OnEventOccurred += ev.Fuckup;
+            a.OnEventOccurred += ev.GetTime;
             a.OnEventOccurred += ev.GetLessonsList;
             a.OnEventOccurred += ev.GetFriend;
             a.OnEventOccurred += ev.GetUserName;

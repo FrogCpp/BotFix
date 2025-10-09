@@ -9,15 +9,10 @@ namespace BotFix
 {
     internal class TimeController
     {
-        private DateTime targetTime;
         private Timer checkTimer;
-        private bool isFunctionExecutedToday = false;
         private TelegramController tgc;
-        public TimeController(float time, TelegramController tgControl) 
+        public TimeController(TelegramController tgControl) 
         {
-            //Console.WriteLine(DateTime.Now);
-            targetTime = DateTime.Today.AddHours(time);
-
             checkTimer = new Timer(CheckTime, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
 
             tgc = tgControl;
@@ -27,27 +22,34 @@ namespace BotFix
         {
             DateTime now = DateTime.Now;
 
-            if (!isFunctionExecutedToday && now >= targetTime)
-            {
-                mainFunc();
-
-                isFunctionExecutedToday = true;
-
-                targetTime = targetTime.AddDays(1);
-            }
-
-            if (now.Hour == 0 && now.Minute == 0)
-            {
-                isFunctionExecutedToday = false;
-            }
-        }
-
-        private void mainFunc()
-        {
             using (var f = new FileManager())
             {
                 foreach (var i in f.MyUsers)
                 {
+                    if (!i.isSendedToday && now >= i.Time)
+                    {
+                        mainFunc(i.userID);
+
+                        i.isSendedToday = true;
+
+                        i.Time = i.Time.AddDays(1);
+                    }
+
+                    if (now.Hour == 0 && now.Minute == 0)
+                    {
+                        i.isSendedToday = false;
+                    }
+                }
+            }
+        }
+
+        private void mainFunc(long usID)
+        {
+            using (var f = new FileManager())
+            {
+                if (f.TryGetUser(usID, out var ii))
+                {
+                    var i = ii[0];
                     string a = i.MyLessonsList; ;
                     if (i.guest)
                     {
@@ -64,7 +66,7 @@ namespace BotFix
                     }
 
                     if (a == null)
-                        continue;
+                        return;
                     int dayNumber = (int)DateTime.Now.DayOfWeek;
 
                     try
@@ -92,7 +94,7 @@ namespace BotFix
                     {
                         Console.WriteLine(e.Message);
                         tgc.SendMessage($"{i.usrName}, похоже, ты плохо заполнил поле, или сделал это некорректно (либо твой админ хаха)\nЕсли ты умный, и можешь сам все починить, то вот ошибка в твоем расписании:\n{e.Message}", i.userID);
-                        continue;
+                        return;
                     }
                 }
             }
