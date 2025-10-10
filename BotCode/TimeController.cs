@@ -35,7 +35,7 @@ namespace BotFix
                         i.Time = i.Time.AddDays(1);
                     }
 
-                    if (now.Hour == 0 && now.Minute == 0)
+                    if (now.Hour == 0 && now.Minute == 1)
                     {
                         i.isSendedToday = false;
                     }
