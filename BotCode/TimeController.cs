@@ -50,7 +50,7 @@ namespace BotFix
                 if (f.TryGetUser(usID, out var ii))
                 {
                     var i = ii[0];
-                    string a = i.MyLessonsList; ;
+                    string a = i.MyLessonsList;
                     if (i.guest)
                     {
                         if(f.TryGetUser(i.FriendKey, out var usrs))
@@ -67,7 +67,7 @@ namespace BotFix
 
                     if (a == null)
                         return;
-                    int dayNumber = (int)DateTime.Now.DayOfWeek;
+                    int dayNumber = (int)DateTime.Now.DayOfWeek + 1;
 
                     try
                     {
