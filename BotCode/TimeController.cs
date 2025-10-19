@@ -67,7 +67,7 @@ namespace BotFix
 
                     if (a == null)
                         return;
-                    int dayNumber = (int)DateTime.Now.DayOfWeek + 1;
+                    int dayNumber = (int)DateTime.Now.DayOfWeek;
 
                     try
                     {
@@ -88,7 +88,7 @@ namespace BotFix
                             uint weight = subject.WeightG;
                             outp += $"- {title} [{weight}г]\n";
                         }
-                        tgc.SendMessage($"{i.usrName}, вот твое расписание на завтрашний день!{outp}", i.userID);
+                        tgc.SendMessage($"{i.usrName}, вот твое расписание на завтрашний день!{outp}\n\nЗавтрашний день по моему мнению: {dayNumber}: {IntToWeekday(dayNumber)}", i.userID);
                     }
                     catch (Exception e)
                     {
