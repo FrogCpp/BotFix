@@ -67,14 +67,12 @@ namespace BotFix
 
                     if (a == null)
                         return;
-                    int dayNumber = (int)DateTime.Now.DayOfWeek;
 
                     try
                     {
-                        List<DaySchedule> splited = SplitMyString(a);
+                        List<DaySchedule> splited = SplitMyStringBeta(a);
 
-
-                        List<DaySchedule> splitResult = Split.NextFor2(splited, IntToWeekday(dayNumber));
+                        List<DaySchedule> splitResult = Split.NextFor2(splited, GetCurrentWeekday(1));
 
 
                         string outp = "\n";
@@ -88,7 +86,7 @@ namespace BotFix
                             uint weight = subject.WeightG;
                             outp += $"- {title} [{weight}г]\n";
                         }
-                        tgc.SendMessage($"{i.usrName}, вот твое расписание на завтрашний день!{outp}\n\nЗавтрашний день по моему мнению: {dayNumber}: {IntToWeekday(dayNumber)}", i.userID);
+                        tgc.SendMessage($"{i.usrName}, вот твое расписание на завтрашний день!{outp}", i.userID);
                     }
                     catch (Exception e)
                     {
@@ -105,43 +103,55 @@ namespace BotFix
             checkTimer?.Dispose();
         }
 
-        static private Weekday IntToWeekday(int input)
+        public Weekday GetCurrentWeekday(int offset = 0)
         {
-            return input switch
-            {
-                1 => Weekday.Monday,
-                2 => Weekday.Tuesday,
-                3 => Weekday.Wednesday,
-                4 => Weekday.Thursday,
-                5 => Weekday.Friday,
-                6 => Weekday.Saturday,
-                0 => Weekday.Sunday,
-                _ => Weekday.Undefined
-            };
+            DateTime targetDate = DateTime.Now.AddDays(offset);
+            int dayNumber = (int)targetDate.DayOfWeek;
+            return dayNumber == 0 ? Weekday.Sunday : (Weekday)dayNumber;
         }
 
-        private List<DaySchedule> SplitMyString(string text)
+
+        private List<DaySchedule> SplitMyStringBeta(string text)
         {
-            List<DaySchedule> LessonsLst = [];
-            List<string> a = text.Split("*\n").ToList<string>();
-            for (int j = 0; j < a.Count; j++)
+            List<DaySchedule> lessonsList = new();
+
+            string[] dayBlocks = text.Split("*\n", StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string dayBlock in dayBlocks)
             {
-                DaySchedule c = new DaySchedule();
-                foreach (string lesson in a[j].Split('\n'))
+                DaySchedule daySchedule = new DaySchedule();
+                string[] lessons = dayBlock.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (string lesson in lessons)
                 {
-                    if (lesson.Contains(' '))
+                    string[] parts = lesson.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                    switch (parts.Length)
                     {
-                        var b = lesson.Split(' ');
-                        c.AddSubject(new Subject(b[0], uint.Parse(b[1])));
-                    }
-                    else
-                    {
-                        c.AddSubject(new Subject(lesson));
+                        case 3:
+                            string name = parts[0];
+                            if (uint.TryParse(parts[1], out uint duration))
+                            {
+                                daySchedule.AddSubject(new Subject(name, duration, parts[2] == "1"));
+                            }
+                            break;
+
+                        case 2:
+                            if (uint.TryParse(parts[1], out uint duration2))
+                            {
+                                daySchedule.AddSubject(new Subject(parts[0], duration2));
+                            }
+                            break;
+
+                        case 1:
+                            daySchedule.AddSubject(new Subject(parts[0], 0));
+                            break;
                     }
                 }
-                LessonsLst.Add(c);
+                lessonsList.Add(daySchedule);
             }
-            return LessonsLst;
+
+            return lessonsList;
         }
     }
 }
