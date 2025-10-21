@@ -109,7 +109,7 @@ namespace BotFix
 
                             if (f.TryGetUser(us.FriendKey, out var friend))
                             {
-                                if (friend.Length == 1)
+                                if (friend.Length == 0)
                                 {
                                     _tgMethods.SendMessage("Друзей у тебя, похоже, нет. Либо ты ошибся с ключем. . . проверь хорошенько. (мы попытались найти человека с таким ключем, но никого нет. . .)", uID);
                                 }
@@ -120,6 +120,7 @@ namespace BotFix
                                         if (e.userID != us.userID)
                                         {
                                             _tgMethods.SendMessage($"к тебе добавился твой друг {us.usrName}", e.userID);
+                                            _tgMethods.SendMessage($"Ты ввел ключь человека с именем {e.usrName}, похоже на него, правда? XD", uID);
                                         }
                                     }
                                 }
@@ -196,7 +197,7 @@ namespace BotFix
             if (text == "neofetch")
             {
                 string infoFile = File.ReadAllText(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/users.json");
-                string info = "version: 4.1\n21.10.2025\n";
+                string info = "version: 4.2\n21.10.2025\n";
                 string art = "                   *+                   \r\n                  *+++                  \r\n                  ++++                  \r\n                 ++++++                 \r\n                +++++++=                \r\n               +++++++++=               \r\n               +++++++++=+              \r\n              +++++++++++=              \r\n             ===++++++++++=             \r\n            =========++++++=            \r\n           =======++++++++++=           \r\n          ====++++++++++++++++          \r\n         ==++++++++++++++++++++         \r\n        ++++++++++    ++++++++++        \r\n       +++++++++*      ++++++++++       \r\n      *+++++++++        ++++++++++      \r\n     *++++++++++        ++++++++*++     \r\n    ++++++++++++        *+++++++++*     \r\n   *+++++++++++*        *++++++++++++   \r\n  +++++++*                    *+++++++  \r\n *++++                            +++++ \r\n*++                                  **+\r\n";
                 _tgMethods.SendMessage(info + art + '\n' + infoFile, uID);
             }
