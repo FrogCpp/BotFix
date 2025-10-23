@@ -19,9 +19,9 @@ namespace BotFix
         public short registrSteps;
         public long userID;
         public string FriendKey;
-        public string usrName;
+        public string usrName = "undefined";
         public bool guest;
-        public string MyLessonsList;
+        public string MyLessonsList = "undefined";
         public DateTime Time;
         public bool isSendedToday;
 
@@ -197,7 +197,7 @@ namespace BotFix
             if (text == "neofetch")
             {
                 string infoFile = File.ReadAllText(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/users.json");
-                string info = "version: 4.2\n21.10.2025\n";
+                string info = "version: 4.3\n21.10.2025\n";
                 string art = "                   *+                   \r\n                  *+++                  \r\n                  ++++                  \r\n                 ++++++                 \r\n                +++++++=                \r\n               +++++++++=               \r\n               +++++++++=+              \r\n              +++++++++++=              \r\n             ===++++++++++=             \r\n            =========++++++=            \r\n           =======++++++++++=           \r\n          ====++++++++++++++++          \r\n         ==++++++++++++++++++++         \r\n        ++++++++++    ++++++++++        \r\n       +++++++++*      ++++++++++       \r\n      *+++++++++        ++++++++++      \r\n     *++++++++++        ++++++++*++     \r\n    ++++++++++++        *+++++++++*     \r\n   *+++++++++++*        *++++++++++++   \r\n  +++++++*                    *+++++++  \r\n *++++                            +++++ \r\n*++                                  **+\r\n";
                 _tgMethods.SendMessage(info + art + '\n' + infoFile, uID);
             }
