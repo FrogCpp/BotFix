@@ -151,7 +151,7 @@ namespace BotFix
                             string name = parts[0];
                             if (uint.TryParse(parts[1], out uint duration))
                             {
-                                daySchedule.AddSubject(new Subject(name, duration, parts[2] == "1"));
+                                daySchedule.AddSubject(new Subject(name, duration, parts[2] == "1", true));
                             }
                             break;
 
