@@ -217,6 +217,9 @@ namespace BotFix
                     us.registrSteps = 1;
                     var rand = new Random();
                     us.FriendKey = new string(Enumerable.Range(0, 10).Select(_ => (char)rand.Next(33, 127)).ToArray());
+                    us.isSendedToday = false;
+                    us.guest = true;
+                    us.MyLessonsList = "";
                     _tgMethods.SendMessage("Здравствуй новый пользователь!\nМы тебя уже знаем, но давай познакомимся еще раз.\nвведи своё имя:", uID);
                 }
             }

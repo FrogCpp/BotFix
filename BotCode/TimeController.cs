@@ -38,6 +38,10 @@ namespace BotFix
                     if (now.Hour == 0 && now.Minute == 1)
                     {
                         i.isSendedToday = false;
+                        if (i.Time.Day != DateTime.Now.Day)
+                        {
+                            i.Time = i.Time.AddDays(1);
+                        }
                     }
                 }
             }
@@ -86,7 +90,7 @@ namespace BotFix
                             uint weight = subject.WeightG;
                             outp += $"- {title} [{weight}г]\n";
                         }
-                        tgc.SendMessage($"{i.usrName}, вот твое расписание на завтрашний день!{outp}", i.userID);
+                        tgc.SendMessage($"{i.usrName}, вот твое расписание на {WeekdayToString(GetCurrentWeekday(1))}!{outp}", i.userID);
                     }
                     catch (Exception e)
                     {
@@ -108,6 +112,21 @@ namespace BotFix
             DateTime targetDate = DateTime.Now.AddDays(offset);
             int dayNumber = (int)targetDate.DayOfWeek;
             return dayNumber == 0 ? Weekday.Sunday : (Weekday)dayNumber;
+        }
+
+        static private string WeekdayToString(Weekday weekday)
+        {
+            return weekday switch
+            {
+                Weekday.Monday => "Понедельник",
+                Weekday.Tuesday => "Вторник",
+                Weekday.Wednesday => "Среду",
+                Weekday.Thursday => "Четверг",
+                Weekday.Friday => "Пятницу",
+                Weekday.Saturday => "Субботу",
+                Weekday.Sunday => "Воскресенье",
+                _ => "Undefined"
+            };
         }
 
 
