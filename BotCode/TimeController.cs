@@ -38,7 +38,13 @@ namespace BotFix
                     if (now.Hour == 0 && now.Minute == 1)
                     {
                         i.isSendedToday = false;
-                        if (i.Time.Day != DateTime.Now.Day)
+
+                        while (i.Time.Month != DateTime.Now.Month)
+                        {
+                            i.Time = i.Time.AddDays(1);
+                        }
+
+                        while (i.Time.Day != DateTime.Now.Day)
                         {
                             i.Time = i.Time.AddDays(1);
                         }
@@ -107,6 +113,29 @@ namespace BotFix
             checkTimer?.Dispose();
         }
 
+
+        public void FixDeathConsequences()
+        {
+            DateTime now = DateTime.Now;
+
+            using (var f = new FileManager())
+            {
+                foreach (var i in f.MyUsers)
+                {
+                    i.isSendedToday = false;
+
+                    while (i.Time.Month != DateTime.Now.Month)
+                    {
+                        i.Time = i.Time.AddDays(1);
+                    }
+
+                    while (i.Time.Day != DateTime.Now.Day)
+                    {
+                        i.Time = i.Time.AddDays(1);
+                    }
+                }
+            }
+        }
         public Weekday GetCurrentWeekday(int offset = 0)
         {
             DateTime targetDate = DateTime.Now.AddDays(offset);

@@ -42,7 +42,7 @@ namespace BotFix
 
         public void startE(string text, long uID)
         {
-            if (text != "/start")
+            if (text.ToLower() != "/start")
                 return;
 
             using (var f = new FileManager())
@@ -86,6 +86,9 @@ namespace BotFix
 
         public void GetFriend(string text, long uID)
         {
+            if (text[0] == '/')
+                return;
+
             using (var f = new FileManager())
             {
                 UserSettings us;
@@ -166,6 +169,8 @@ namespace BotFix
 
         public void GetTime(string text, long uID)
         {
+            if (text[0] == '/')
+                return;
             using (var f = new FileManager())
             {
                 UserSettings us;
@@ -194,7 +199,7 @@ namespace BotFix
 
         public void neofetch(string text, long uID)
         {
-            if (text == "neofetch")
+            if (text.ToLower() == "neofetch")
             {
                 string infoFile = File.ReadAllText(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/users.json");
                 string info = "version: 4.3\n21.10.2025\n";
@@ -205,7 +210,7 @@ namespace BotFix
 
         public void Fuckup(string text, long uID)
         {
-            if (text != "/fail")
+            if (text.ToLower() != "/fail")
                 return;
             using (var f = new FileManager())
             {
@@ -213,7 +218,7 @@ namespace BotFix
                 if (f.TryGetUser(uID, out var usv))
                 {
                     us = usv[0];
-                    us.usrName = "lox";
+                    us.usrName = "";
                     us.registrSteps = 1;
                     var rand = new Random();
                     us.FriendKey = new string(Enumerable.Range(0, 10).Select(_ => (char)rand.Next(33, 127)).ToArray());
