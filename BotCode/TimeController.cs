@@ -41,12 +41,31 @@ namespace BotFix
 
                         while (i.Time.Month != DateTime.Now.Month)
                         {
-                            i.Time = i.Time.AddDays(1);
+                            if (i.Time.Month > DateTime.Now.Month)
+                            {
+                                i.Time = i.Time.AddDays(-1);
+                            }
+                            else
+                            {
+                                i.Time = i.Time.AddDays(1);
+                            }
                         }
 
                         while (i.Time.Day != DateTime.Now.Day)
                         {
-                            i.Time = i.Time.AddDays(1);
+                            if (i.Time.Month > DateTime.Now.Month)
+                            {
+                                i.Time = i.Time.AddDays(-1);
+                            }
+                            else
+                            {
+                                i.Time = i.Time.AddDays(1);
+                            }
+                        }
+
+                        if (now.Month == 1 && now.Day == 1)
+                        {
+                            tgc.SendMessage($"{i.usrName}, с новым годом!", i.userID);
                         }
                     }
                 }
@@ -126,7 +145,14 @@ namespace BotFix
 
                     while (i.Time.Month != DateTime.Now.Month)
                     {
-                        i.Time = i.Time.AddDays(1);
+                        if (i.Time.Month > DateTime.Now.Month)
+                        {
+                            i.Time = i.Time.AddDays(-1);
+                        }
+                        else
+                        {
+                            i.Time = i.Time.AddDays(1);
+                        }
                     }
 
                     while (i.Time.Day != DateTime.Now.Day)
