@@ -26,42 +26,23 @@ namespace BotFix
             {
                 foreach (var i in f.MyUsers)
                 {
-                    if (!i.isSendedToday && now >= i.Time)
+                    if (!i.isSendedToday && now.Hour >= i.Time.Hour && now.Minute >= i.Time.Minute)
                     {
                         mainFunc(i.userID);
 
                         i.isSendedToday = true;
 
-                        i.Time = i.Time.AddDays(1);
                     }
 
                     if (now.Hour == 0 && now.Minute == 1)
                     {
                         i.isSendedToday = false;
 
-                        while (i.Time.Month != DateTime.Now.Month)
-                        {
-                            if (i.Time.Month > DateTime.Now.Month)
-                            {
-                                i.Time = i.Time.AddDays(-1);
-                            }
-                            else
-                            {
-                                i.Time = i.Time.AddDays(1);
-                            }
-                        }
+                        int Hours = i.Time.Hour, Minutes = i.Time.Minute;
 
-                        while (i.Time.Day != DateTime.Now.Day)
-                        {
-                            if (i.Time.Month > DateTime.Now.Month)
-                            {
-                                i.Time = i.Time.AddDays(-1);
-                            }
-                            else
-                            {
-                                i.Time = i.Time.AddDays(1);
-                            }
-                        }
+                        i.Time = now;
+                        i.Time.AddHours(Hours);
+                        i.Time.AddMinutes(Minutes);
 
                         if (now.Month == 1 && now.Day == 1)
                         {
@@ -142,23 +123,6 @@ namespace BotFix
                 foreach (var i in f.MyUsers)
                 {
                     i.isSendedToday = false;
-
-                    while (i.Time.Month != DateTime.Now.Month)
-                    {
-                        if (i.Time.Month > DateTime.Now.Month)
-                        {
-                            i.Time = i.Time.AddDays(-1);
-                        }
-                        else
-                        {
-                            i.Time = i.Time.AddDays(1);
-                        }
-                    }
-
-                    while (i.Time.Day != DateTime.Now.Day)
-                    {
-                        i.Time = i.Time.AddDays(1);
-                    }
                 }
             }
         }
