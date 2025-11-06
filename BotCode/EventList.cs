@@ -202,7 +202,7 @@ namespace BotFix
             if (text.ToLower() == "neofetch")
             {
                 string infoFile = File.ReadAllText(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/users.json");
-                string info = "version: 4.3\n21.10.2025\n";
+                string info = "version: 4.4\n06.11.2025\n";
                 string art = "                   *+                   \r\n                  *+++                  \r\n                  ++++                  \r\n                 ++++++                 \r\n                +++++++=                \r\n               +++++++++=               \r\n               +++++++++=+              \r\n              +++++++++++=              \r\n             ===++++++++++=             \r\n            =========++++++=            \r\n           =======++++++++++=           \r\n          ====++++++++++++++++          \r\n         ==++++++++++++++++++++         \r\n        ++++++++++    ++++++++++        \r\n       +++++++++*      ++++++++++       \r\n      *+++++++++        ++++++++++      \r\n     *++++++++++        ++++++++*++     \r\n    ++++++++++++        *+++++++++*     \r\n   *+++++++++++*        *++++++++++++   \r\n  +++++++*                    *+++++++  \r\n *++++                            +++++ \r\n*++                                  **+\r\n";
                 _tgMethods.SendMessage(info + art + '\n' + infoFile, uID);
             }
