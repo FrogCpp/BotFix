@@ -185,6 +185,7 @@ namespace BotFix
                             us.Time = t + DateTime.Parse(text).TimeOfDay;
                             _tgMethods.SendMessage($"{t} - дата, которую я (как программа) определяю, как сегодня.", uID);
                             _tgMethods.SendMessage($"Умничка {us.usrName}, теперь жди {us.Time} и тогда тебе должно прийти расписание.", uID);
+                            _tgMethods.SendMessage($"если тебе не понравилось время, которое ты установил, то по аналогии с /setFriendKey, ты можешь сетнуть новое время с помощью /setTime", uID);
                             us.registrSteps++;
                         }
                         catch (Exception e)
@@ -202,9 +203,8 @@ namespace BotFix
             if (text.ToLower() == "neofetch")
             {
                 string infoFile = File.ReadAllText(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/users.json");
-                string info = "version: 4.4\n06.11.2025\n";
-                string art = "                   *+                   \r\n                  *+++                  \r\n                  ++++                  \r\n                 ++++++                 \r\n                +++++++=                \r\n               +++++++++=               \r\n               +++++++++=+              \r\n              +++++++++++=              \r\n             ===++++++++++=             \r\n            =========++++++=            \r\n           =======++++++++++=           \r\n          ====++++++++++++++++          \r\n         ==++++++++++++++++++++         \r\n        ++++++++++    ++++++++++        \r\n       +++++++++*      ++++++++++       \r\n      *+++++++++        ++++++++++      \r\n     *++++++++++        ++++++++*++     \r\n    ++++++++++++        *+++++++++*     \r\n   *+++++++++++*        *++++++++++++   \r\n  +++++++*                    *+++++++  \r\n *++++                            +++++ \r\n*++                                  **+\r\n";
-                _tgMethods.SendMessage(info + art + '\n' + infoFile, uID);
+                string info = "version: 5.0\n27.11.2025\n";
+                _tgMethods.SendMessage(info + '\n' + '\n' + infoFile + '\n', uID);
             }
         }
 
@@ -268,6 +268,26 @@ namespace BotFix
                     {
                         _tgMethods.SendMessage("Друзей у тебя, похоже, нет. Либо ты ошибся с ключем. . . проверь хорошенько. (мы попытались найти человека с таким ключем, такого больше нет. . .)", uID);
                     }
+                }
+            }
+        }
+
+
+        public void NewTime(string text, long uID)
+        {
+            if (!text.Contains("/setTime"))
+                return;
+
+            string[] tx = text.Split(' ');
+            _tgMethods.SendMessage($"Так, здесь ты установил новое время", uID);
+            using (var f = new FileManager())
+            {
+                UserSettings us;
+                if (f.TryGetUser(uID, out var usv))
+                {
+                    us = usv[0];
+                    us.Time = DateTime.Parse(tx[1]);
+                    _tgMethods.SendMessage($"твое новое время отправки выглядит так: {us.Time}", uID);
                 }
             }
         }

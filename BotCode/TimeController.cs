@@ -26,28 +26,15 @@ namespace BotFix
             {
                 foreach (var i in f.MyUsers)
                 {
-                    if (!i.isSendedToday && now.Hour >= i.Time.Hour && now.Minute >= i.Time.Minute)
+                    if (i.Time.Minute >= now.Minute && i.Time.Hour >= now.Hour && !i.isSendedToday)
                     {
                         mainFunc(i.userID);
-
                         i.isSendedToday = true;
-
                     }
 
-                    if (now.Hour == 0 && now.Minute == 1)
+                    if (now.Hour >= 0 && now.Minute >= 1)
                     {
                         i.isSendedToday = false;
-
-                        int Hours = i.Time.Hour, Minutes = i.Time.Minute;
-
-                        i.Time = now;
-                        i.Time.AddHours(Hours);
-                        i.Time.AddMinutes(Minutes);
-
-                        if (now.Month == 1 && now.Day == 1)
-                        {
-                            tgc.SendMessage($"{i.usrName}, с новым годом!", i.userID);
-                        }
                     }
                 }
             }
